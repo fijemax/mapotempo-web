@@ -77,6 +77,7 @@
 //= require_tree ../../templates
 //= require paloma
 //= require leaflet.polylineoffset
+//= require Leaflet.VectorGrid.bundled
 //= require pnotify/pnotify.js
 //= require pnotify/pnotify.buttons.js
 //= require pnotify/pnotify.nonblock.js

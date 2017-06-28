@@ -223,7 +223,7 @@ var RoutesLayer = L.FeatureGroup.extend({
       return currentZoom > 15 ? 1 : 30;
     },
     spiderfyDistanceMultiplier: 0.5,
-    // disableClusteringAtZoom: 12,
+    disableClusteringAtZoom: 16,
     iconCreateFunction: function(cluster) {
       var currentZoom = cluster._map.getZoom();
 
@@ -291,7 +291,7 @@ var RoutesLayer = L.FeatureGroup.extend({
 
     this.on('mouseover', function(e) {
       if (e.layer instanceof L.Marker && !popupModule.activeClickMarker) {
-        // Unbind pop when needed | != compare memory adress between marker objects (Very same instance equality).
+        // Unbind pop when needed | != compare memory address between marker objects (Very same instance equality).
 
         if (popupModule.previousMarker && (popupModule.previousMarker != e.layer))
           popupModule.previousMarker.closePopup();
@@ -304,11 +304,6 @@ var RoutesLayer = L.FeatureGroup.extend({
         } else if (!e.layer.getPopup().isOpen()) {
           e.layer.openPopup();
         }
-      } else if (e.layer instanceof L.Path) {
-        e.layer.setStyle({
-          opacity: 0.9,
-          weight: 7
-        });
       }
     }).on('mouseout', function(e) {
       if (e.layer instanceof L.Marker) {
@@ -316,72 +311,44 @@ var RoutesLayer = L.FeatureGroup.extend({
         if (!e.layer.click && e.layer.getPopup()) {
           e.layer.closePopup();
         }
-      } else if (e.layer instanceof L.Path) {
-        e.layer.setStyle({
-          opacity: 0.5,
-          weight: 5
-        });
       }
 
       if (self.popupOpenTimer) {
         clearTimeout(self.popupOpenTimer);
       }
     })
-    .on('click', function(e) {
-      // Open popup if only one is actually in a click statement.
-      if (e.layer instanceof L.Marker) {
-        if (e.layer.properties.stop_id) {
-          this.fire('clickStop', {
-            stopId: e.layer.properties.stop_id
-          });
-        }
-        if (e.layer.click) {
-          if (e.layer === popupModule.activeClickMarker) {
-            e.layer.closePopup();
-            popupModule.activeClickMarker = void(0);
+      .on('click', function(e) {
+        // Open popup if only one is actually in a click statement.
+        if (e.layer instanceof L.Marker) {
+          if (e.layer.properties.stop_id) {
+            this.fire('clickStop', {
+              stopId: e.layer.properties.stop_id
+            });
           }
-          e.layer.click = false;
-        } else {
-          if (popupModule.activeClickMarker === void(0)) {
-            if (!e.layer.getPopup()) {
-              popupModule.createPopupForLayer(e.layer);
-            } else {
-              e.layer.openPopup();
+          if (e.layer.click) {
+            if (e.layer === popupModule.activeClickMarker) {
+              e.layer.closePopup();
+              popupModule.activeClickMarker = void(0);
             }
-          } else if (e.layer !== popupModule.activeClickMarker) {
-            popupModule.activeClickMarker.click = false;
-            popupModule.activeClickMarker.closePopup()
-              .unbindPopup();
-            popupModule.createPopupForLayer(e.layer);
+            e.layer.click = false;
+          } else {
+            if (popupModule.activeClickMarker === void(0)) {
+              if (!e.layer.getPopup()) {
+                popupModule.createPopupForLayer(e.layer);
+              } else {
+                e.layer.openPopup();
+              }
+            } else if (e.layer !== popupModule.activeClickMarker) {
+              popupModule.activeClickMarker.click = false;
+              popupModule.activeClickMarker.closePopup()
+                .unbindPopup();
+              popupModule.createPopupForLayer(e.layer);
+            }
+            popupModule.activeClickMarker = e.layer;
+            e.layer.click = true;
           }
-          popupModule.activeClickMarker = e.layer;
-          e.layer.click = true;
         }
-      } else if (e.layer instanceof L.Path) {
-        var distance = e.layer.properties.distance / 1000;
-        var driveTime = e.layer.properties.drive_time;
-        distance = (self.options.unit === 'km') ? distance.toFixed(1) + ' km' : (distance / 1.609344).toFixed(1) + ' miles';
-
-        if (driveTime) {
-          var driveTimeDay = null;
-          if (driveTime > 3600 * 24) {
-            driveTimeDay = driveTime / (3600 * 24) | 0;
-          }
-          driveTime = ('0' + parseInt(driveTime / 3600) % 24).slice(-2) + ':' + ('0' + parseInt(driveTime / 60) % 60).slice(-2) + ':' + ('0' + (driveTime % 60)).slice(-2);
-          if (driveTimeDay) {
-            driveTime += ' (' + I18n.t('plannings.edit.popup.day') + driveTimeDay + ')';
-          }
-        } else {
-          driveTime = '';
-        }
-
-        var content = (driveTime ? '<div>' + I18n.t('plannings.edit.popup.stop_drive_time') + ' ' + driveTime + '</div>' : '') + '<div>' + I18n.t('plannings.edit.popup.stop_distance') + ' ' + distance + '</div>';
-        L.responsivePopup({
-          minWidth: 200,
-          autoPan: false
-        }).setLatLng(e.latlng).setContent(content).openOn(self.map);
-      }
-    }).on('popupopen', function(e) {
+      }).on('popupopen', function(e) {
       // Silence is golden
     }).on('popupclose', function(e) {
       // Silence is golden
@@ -490,39 +457,114 @@ var RoutesLayer = L.FeatureGroup.extend({
     });
   },
 
-  _formatGeojsonFromPolylines: function(geojson) {
+  _formatGeojson: function (geojson) {
+    var routes = [];
+    var markers = [];
+
     for (var i = 0; i < geojson.features.length; i++) {
       if (geojson.features[i].geometry.polylines) {
         var feature = geojson.features[i];
+
         feature.geometry.coordinates = L.PolylineUtil.decode(feature.geometry.polylines, 6);
         for (var j = 0; j < feature.geometry.coordinates.length; j++) {
           feature.geometry.coordinates[j] = [feature.geometry.coordinates[j][1], feature.geometry.coordinates[j][0]];
         }
         delete feature.geometry.polylines;
+
+        routes.push(geojson.features[i]);
+      } else {
+        markers.push(geojson.features[i]);
       }
     }
+
+    return [routes, markers];
   },
 
   _addRoutes: function(geojson) {
     var self = this;
 
-    self._formatGeojsonFromPolylines(geojson);
+    var routesAndMarkers = self._formatGeojson(geojson);
+    var routeFeatures = routesAndMarkers[0];
+    var markerFeatures = routesAndMarkers[1];
+    geojson = void(0);
 
+    // Display routes first
+    var geojsonRoutes = {
+      type: 'FeatureCollection',
+      features: routeFeatures
+    };
+    var vectorGrid = L.vectorGrid.slicer(geojsonRoutes, {
+      rendererFactory: L.svg.tile,
+      maxZoom: 18,
+      vectorTileLayerStyles: {
+        sliced: function (properties, zoom) {
+          return {
+            fillColor: properties.color,
+            stroke: true,
+            fill: true,
+            color: properties.color,
+            opacity: 0.4,
+            weight: 4
+          }
+        }
+      },
+      interactive: true,
+      getFeatureId: function (f) {
+        return f.properties.route_id + '-' + f.properties.index;
+      }
+    });
+    vectorGrid.on('mouseover', function (event) {
+      var uniqId = event.layer.properties.route_id + '-' + event.layer.properties.index;
+      var overStyle = {
+        fillColor: event.layer.properties.color,
+        color: event.layer.properties.color,
+        opacity: 0.9,
+        weight: 6
+      };
+
+      vectorGrid.setFeatureStyle(uniqId, overStyle);
+    })
+      .on('mouseout', function (event) {
+        var uniqId = event.layer.properties.route_id + '-' + event.layer.properties.index;
+        var overStyle = {
+          fillColor: event.layer.properties.color,
+          color: event.layer.properties.color,
+          opacity: 0.4,
+          weight: 4
+        };
+
+        vectorGrid.setFeatureStyle(uniqId, overStyle);
+      })
+      .on('click', function (e) {
+        var distance = e.layer.properties.distance / 1000;
+        var driveTime = e.layer.properties.drive_time;
+        distance = (self.options.unit === 'km') ? distance.toFixed(1) + ' km' : (distance / 1.609344).toFixed(1) + ' miles';
+
+        if (driveTime) {
+          var driveTimeDay = null;
+          if (driveTime > 3600 * 24) {
+            driveTimeDay = driveTime / (3600 * 24) | 0;
+          }
+          driveTime = ('0' + parseInt(driveTime / 3600) % 24).slice(-2) + ':' + ('0' + parseInt(driveTime / 60) % 60).slice(-2) + ':' + ('0' + (driveTime % 60)).slice(-2);
+          if (driveTimeDay) {
+            driveTime += ' (' + I18n.t('plannings.edit.popup.day') + driveTimeDay + ')';
+          }
+        } else {
+          driveTime = '';
+        }
+
+        var content = (driveTime ? '<div>' + I18n.t('plannings.edit.popup.stop_drive_time') + ' ' + driveTime + '</div>' : '') + '<div>' + I18n.t('plannings.edit.popup.stop_distance') + ' ' + distance + '</div>';
+        L.responsivePopup({
+          minWidth: 200,
+          autoPan: false
+        }).setLatLng(e.latlng).setContent(content).openOn(self.map);
+      })
+      .addTo(this.map);
+
+    // Display stops then
     var colorsByRoute = {};
     var overlappingMarkers = {};
-
-    var layer = L.geoJSON(geojson, {
-      onEachFeature: function(feature, layer) {
-        if (feature.properties.route_id) {
-          if (!(feature.properties.route_id in self.layersByRoute)) {
-            self.layersByRoute[feature.properties.route_id] = [];
-          }
-          self.layersByRoute[feature.properties.route_id].push(layer);
-        } else if (feature.properties.store_id) {
-          self.layerStores = layer;
-        }
-        layer.properties = feature.properties;
-      },
+    var layer = L.geoJSON(markerFeatures, {
       style: function(feature) {
         if (!colorsByRoute[feature.properties.route_id]) {
           colorsByRoute[feature.properties.route_id] = feature.properties.color;

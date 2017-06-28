@@ -69,6 +69,7 @@ var mapInitialize = function(params) {
       maxZoom: 18,
       attribution: layer.attribution
     });
+    l.setZIndex(1);
     l.name = layer.name;
     if (layer.default) {
       mapLayer = l;
@@ -135,7 +136,8 @@ var mapInitialize = function(params) {
 
   if (nbLayers > 1) {
     L.control.layers(mapBaseLayers, mapOverlays, {
-      position: 'topleft'
+      position: 'topleft',
+      autoZIndex: false
     }).addTo(map);
   } else {
     map.tileLayer = L.tileLayer(mapLayer.url, {
