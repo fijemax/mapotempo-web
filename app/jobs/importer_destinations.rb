@@ -346,7 +346,7 @@ class ImporterDestinations < ImporterBase
     @customer.save!
 
     unless @routes.keys.compact.empty?
-      @planning = @customer.plannings.find_by(ref: @planning_hash['ref']) if @planning_hash.key?('ref')
+      @planning = @customer.plannings.find{ |p| p.ref == @planning_hash['ref'] } if @planning_hash.key?('ref')
       unless @planning
         # Do not link the planning to has_many of the customer, to avoid cascading while saving from customer.
         # The following save_import does not re-synchr the object in memory from database, unless explicitly requested.

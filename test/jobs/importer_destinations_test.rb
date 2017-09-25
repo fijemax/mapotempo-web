@@ -82,6 +82,8 @@ class ImporterDestinationsTest < ActionController::TestCase
 
   test 'should import without ref and multi visit' do
     @customer.update! enable_multi_visits: true # Move dest.ref to visit.ref !
+    @customer.reload # Force reload after callback save
+
     import_count = 1
     dest = nil
     assert_difference('Destination.count', import_count) do
@@ -244,6 +246,8 @@ class ImporterDestinationsTest < ActionController::TestCase
 
   test 'should import with many visits' do
     @customer.update! enable_multi_visits: true # Move dest.ref to visit.ref !
+    @customer.reload # Force reload after callback save
+
     dest_import_count = 6
     visit_import_count = 7
     visit_tag1_import_count = 1

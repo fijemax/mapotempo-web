@@ -255,6 +255,8 @@ class CustomerTest < ActiveSupport::TestCase
         assert_equal tags, customer.destinations.collect { |d| d.visits.collect { |v| v.tags.collect(&:label) }.flatten }.flatten
       end
     end
+
+    customer.reload
     assert_no_difference('Destination.count') do
       assert_no_difference('Visit.count') do
         customer.enable_multi_visits = false

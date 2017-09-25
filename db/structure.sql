@@ -621,7 +621,8 @@ CREATE TABLE routes (
     geojson_tracks text[],
     geojson_points text[],
     stop_no_path boolean,
-    quantities hstore
+    quantities hstore,
+    lock_version integer DEFAULT 0 NOT NULL
 );
 
 
@@ -2641,4 +2642,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170901101949');
 INSERT INTO schema_migrations (version) VALUES ('20170907120124');
 
 INSERT INTO schema_migrations (version) VALUES ('20170912095236');
+
+INSERT INTO schema_migrations (version) VALUES ('20170925081651');
 

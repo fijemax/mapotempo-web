@@ -200,7 +200,7 @@ class V01::CustomerTest < ActiveSupport::TestCase
     assert_difference('Customer.count', +1) do
       put api_admin(@customer.id.to_s + '/duplicate')
       assert_equal Customer.last.id, JSON.parse(last_response.body, symbolize_names: true)[:id], last_response.body
-      assert last_response.ok?
+      assert last_response.ok?, last_response.body
     end
   end
 
