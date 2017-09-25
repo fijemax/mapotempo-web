@@ -240,6 +240,10 @@ function markerClusterIcon(childCount, defaultColor, borderColors) {
 }
 
 var nbRoutes = 0;
+function clusterRadiusByZoomAndRoute (currentZoom, nbRoutes) {
+  return currentZoom > defaultMapZoom ? 1 : nbRoutes < 4 ? 30 * nbRoutes : 100
+}
+
 var RoutesLayer = L.FeatureGroup.extend({
   defaultOptions: {
     outOfRouteId: undefined,
@@ -269,7 +273,7 @@ var RoutesLayer = L.FeatureGroup.extend({
     animate: false,
     maxClusterRadius: function(currentZoom) {
       // Markers have to be clustered during map initialization with defaultMapZoom
-      return currentZoom > defaultMapZoom ? 1 : nbRoutes < 4 ? 30 * nbRoutes : 100;
+      return clusterRadiusByZoomAndRoute(currentZoom, nbRoutes);
     },
     spiderfyDistanceMultiplier: 0.5,
     // Updated in initialize
@@ -489,6 +493,9 @@ var RoutesLayer = L.FeatureGroup.extend({
   },
 
   switchMarkerClusters: function() {
+    var cursorBody = $('body').css('cursor');
+    $('body').css('cursor', 'pointer');
+
     this.options.disableClusters = !this.options.disableClusters;
 
     var newClustersByRoute = {};
@@ -496,7 +503,16 @@ var RoutesLayer = L.FeatureGroup.extend({
     nbRoutes = Object.keys(this.clustersByRoute).length;
     for (var routeId in this.clustersByRoute) {
       if (this.clustersByRoute.hasOwnProperty(routeId)) {
-        this.markerOptions.disableClusteringAtZoom = this.options.disableClusters ? 0 : 19;
+        // this.markerOptions.disableClusteringAtZoom = this.options.disableClusters ? 0 : 19;
+
+        this.markerOptions.maxClusterRadius = function(currentZoom) {
+          if (this.options.disableClusters) {
+            return 1;
+          } else {
+            return clusterRadiusByZoomAndRoute(currentZoom, nbRoutes);
+          }
+        }.bind(this);
+
         newClustersByRoute[routeId] = L.markerClusterGroup(this.markerOptions);
 
         this.clustersByRoute[routeId].getLayers().forEach(function (routeId, marker) {
@@ -511,6 +527,8 @@ var RoutesLayer = L.FeatureGroup.extend({
         this.clustersByRoute[routeId] = newClustersByRoute[routeId];
       }
     }
+
+    $('body').css('cursor', cursorBody);
   },
 
   focus: function(options) {
