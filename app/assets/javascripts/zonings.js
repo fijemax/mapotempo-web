@@ -86,8 +86,11 @@ var zonings_edit = function(params) {
     popupOptions: {
       isoline: false
     },
-    disableClusters: params.disable_clusters
+    disableClusters: params.disable_clusters,
+    withStops: params.with_stops
   }).addTo(map);
+
+  L.disableClustersControl(map, markersGroup);
 
   var zonesMap = {};
 
@@ -115,8 +118,6 @@ var zonings_edit = function(params) {
       }
     }
   }).addTo(map);
-
-  L.disableClustersControl(map, markersGroup);
 
   var fitBounds = initializeMapHash(map);
 
@@ -520,11 +521,16 @@ var zonings_edit = function(params) {
   $('[name=all-destinations]').change(function() {
     if ($(this).is(':checked')) {
       if (!destLoaded) {
-        markersGroup.showAllRoutes({}, function() {
+        markersGroup.showAllRoutes({}, function(data) {
           destLoaded = true;
           $.each(featureGroup.getLayers(), function(idx, zone) {
             countPointInPolygon(zonesMap[zone._leaflet_id].layer, zonesMap[zone._leaflet_id].ele);
           });
+
+          // if (data && data.features.length > 10) {
+          //   markersGroup.options.disableClusters = false;
+          //   markersGroup.options.withStops = false;
+          // }
         });
       } else {
         map.addLayer(markersGroup);

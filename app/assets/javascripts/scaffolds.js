@@ -415,7 +415,8 @@ L.disableClustersControl = function (map, routesLayer) {
       var icon = L.DomUtil.create('i', 'fa fa-certificate fa-lg', button);
       icon.style.marginLeft = '2px';
 
-      container.onclick = function () {
+      container.onclick = function (event) {
+        event.preventDefault();
         routesLayer.switchMarkerClusters();
       };
 

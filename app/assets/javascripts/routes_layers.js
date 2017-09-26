@@ -241,10 +241,11 @@ function markerClusterIcon(childCount, defaultColor, borderColors) {
 
 var nbRoutes = 0;
 function clusterRadiusByZoomAndRoute (currentZoom, nbRoutes) {
-  return currentZoom > defaultMapZoom ? 1 : nbRoutes < 4 ? 30 * nbRoutes : 100
+  return currentZoom > defaultMapZoom ? 1 : nbRoutes < 4 ? 30 * nbRoutes : 100;
 }
 
 var RoutesLayer = L.FeatureGroup.extend({
+  // In print view, all clusters are disabled
   defaultOptions: {
     outOfRouteId: undefined,
     routes: [],
@@ -257,6 +258,7 @@ var RoutesLayer = L.FeatureGroup.extend({
     withPolylines: true,
     withQuantities: false,
     disableClusters: false,
+    withStops: true,
     showPopupOnHover: true
   },
 
@@ -340,7 +342,7 @@ var RoutesLayer = L.FeatureGroup.extend({
     this.options = $.extend({}, this.defaultOptions, options); // Don't modify defaultOptions which can be reinitialized by turbolinks
 
     if (this.options.disableClusters) {
-      this.markerOptions.disableClusteringAtZoom = this.options.disableClusters ? 0 : 19;
+      this.markerOptions.disableClusteringAtZoom = this.options.disableClusters ? 0 : 20;
     }
 
     // Clear layers if page is reloaded with turbolinks
@@ -493,8 +495,14 @@ var RoutesLayer = L.FeatureGroup.extend({
   },
 
   switchMarkerClusters: function() {
+    // Switch clusters for route clusters
+    // Clusters on same spot are displayed the second time
+
     var cursorBody = $('body').css('cursor');
-    $('body').css('cursor', 'pointer');
+    var cursorMap = $('#map').css('cursor');
+    $('body, #map').css({
+      cursor: 'progress'
+    });
 
     this.options.disableClusters = !this.options.disableClusters;
 
@@ -503,7 +511,7 @@ var RoutesLayer = L.FeatureGroup.extend({
     nbRoutes = Object.keys(this.clustersByRoute).length;
     for (var routeId in this.clustersByRoute) {
       if (this.clustersByRoute.hasOwnProperty(routeId)) {
-        // this.markerOptions.disableClusteringAtZoom = this.options.disableClusters ? 0 : 19;
+        this.markerOptions.disableClusteringAtZoom = this.options.withStops ? 20 : 0;
 
         this.markerOptions.maxClusterRadius = function(currentZoom) {
           if (this.options.disableClusters) {
@@ -528,7 +536,12 @@ var RoutesLayer = L.FeatureGroup.extend({
       }
     }
 
-    $('body').css('cursor', cursorBody);
+    $('body').css({
+      cursor: cursorBody
+    });
+    $('#map').css({
+      cursor: cursorMap
+    });
   },
 
   focus: function(options) {
@@ -615,7 +628,7 @@ var RoutesLayer = L.FeatureGroup.extend({
       success: function(data) {
         this._addRoutes(data);
         if (typeof callback === 'function') {
-          callback();
+          callback(data);
         }
       }.bind(this),
       complete: completeAjaxMap,

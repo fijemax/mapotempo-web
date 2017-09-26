@@ -526,7 +526,8 @@ var plannings_edit = function(params) {
     colorsByRoute: params.colors_by_route,
     appBaseUrl: params.apiWeb ? '/api-web/0.1/' : '/',
     popupOptions: popupOptions,
-    disableClusters: params.disable_clusters
+    disableClusters: params.disable_clusters,
+    withStops: params.with_stops
   }).on('clickStop', function(stop) {
     enlightenStop({index: stop.index, routeId: stop.routeId});
   }).addTo(map);
