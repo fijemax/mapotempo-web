@@ -2,6 +2,7 @@ require 'singleton'
 
 module Exceptions
   class LoopError < StandardError; end
+  class JobInProgressError < StandardError; end
 
   ############################################
   #  Base class for nested model validations #

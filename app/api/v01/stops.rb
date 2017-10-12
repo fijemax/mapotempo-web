@@ -15,6 +15,8 @@
 # along with Mapotempo. If not, see:
 # <http://www.gnu.org/licenses/agpl.html>
 #
+require 'exceptions'
+
 class V01::Stops < Grape::API
   helpers SharedParams
   helpers do
@@ -56,12 +58,10 @@ class V01::Stops < Grape::API
               use :params_from_entity, entity: V01::Entities::Stop.documentation.slice(:active)
             end
             put ':id' do
-              planning_id = Integer(params[:planning_id])
-              route_id = Integer(params[:route_id])
-              id = Integer(params[:id])
-              planning = current_customer.plannings.find{ |planning| planning.id == planning_id }
-              route = planning.routes.find{ |route| route.id == route_id }
-              stop = route.stops.find{ |stop| stop.id == id }
+              planning = current_customer.plannings.where(ParseIdsRefs.read(params[:planning_id])).first!
+              raise Exceptions::JobInProgressError if Job.on_planning(current_customer.job_optimizer, planning.id)
+              route = planning.routes.find{ |route| route.id == Integer(params[:route_id]) } || raise(ActiveRecord::RecordNotFound.new)
+              stop = route.stops.find{ |stop| stop.id == Integer(params[:id]) } || raise(ActiveRecord::RecordNotFound.new)
               Planning.transaction do
                 stop.update! stop_params
                 route.save!
@@ -71,6 +71,7 @@ class V01::Stops < Grape::API
             end
 
             desc 'Move stop position in routes.',
+              # FIXME: Unit test succeeds in move stop from route in another...
               detail: 'Set a new #N position for a stop in route which was in a previous #M position in the same route.',
               nickname: 'moveStop'
             params do
@@ -78,14 +79,13 @@ class V01::Stops < Grape::API
               requires :index, type: Integer, desc: 'New position in the route'
             end
             patch ':id/move/:index' do
-              planning_id = Integer(params[:planning_id])
-              route_id = Integer(params[:route_id])
-              stop_id = Integer(params[:id])
-              planning = current_customer.plannings.find{ |planning| planning.id == planning_id }
+              planning = current_customer.plannings.where(ParseIdsRefs.read(params[:planning_id])).first!
+              raise Exceptions::JobInProgressError if Job.on_planning(current_customer.job_optimizer, planning.id)
               stop = nil
-              planning.routes.find{ |route| stop = route.stops.find{ |stop| stop.id == stop_id } }
+              # FIXME: raise RecordNotFound for route and stop
+              planning.routes.find{ |route| stop = route.stops.find{ |stop| stop.id == Integer(params[:id]) } }
               Planning.transaction do
-                if planning.move_stop(planning.routes.find{ |route| route.id == route_id }, stop, Integer(params[:index])) && planning.compute && planning.save!
+                if planning.move_stop(planning.routes.find{ |route| route.id == Integer(params[:route_id]) }, stop, Integer(params[:index])) && planning.compute && planning.save!
                   status 204
                 else
                   status 400

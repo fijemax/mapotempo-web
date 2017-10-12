@@ -472,6 +472,14 @@ class PlanningsControllerTest < ActionController::TestCase
     assert_equal @planning.routes.size, JSON.parse(response.body)['routes'].size
   end
 
+  test 'should not optimize when an optimization job is already running' do
+    customers(:customer_one).update(job_optimizer: delayed_jobs(:job_optimizer))
+
+    get :optimize, planning_id: @planning, format: :json, global: true
+    assert_valid response
+    assert_response 422
+  end
+
   test 'should duplicate' do
     assert_difference('Planning.count') do
       patch :duplicate, planning_id: @planning

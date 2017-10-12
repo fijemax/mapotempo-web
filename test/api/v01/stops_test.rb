@@ -29,14 +29,28 @@ class V01::StopsTest < ActiveSupport::TestCase
   end
 
   test 'should update stop' do
-    put api(@stop.route.planning.id, @stop.route.id, @stop.id, active: false)
-    assert_equal 204, last_response.status, last_response.body
-    assert_equal false, @stop.reload.active
+    [:during_optimization, nil].each do |mode|
+      customers(:customer_one).update(job_optimizer_id: nil) if mode.nil?
+      put api(@stop.route.planning.id, @stop.route.id, @stop.id, active: false)
+      if mode
+        assert_equal 409, last_response.status, last_response.body
+      else
+        assert_equal 204, last_response.status, last_response.body
+        assert_equal false, @stop.reload.active
+      end
+    end
   end
 
   test 'should move stop position in routes' do
-    patch api(@stop.route.planning.id, @stop.route.id, "#{@stop.route.planning.routes[0].stops[0].id}/move/1")
-    assert_equal 204, last_response.status, last_response.body
-    assert_equal 2, @stop.reload.index
+    [:during_optimization, nil].each do |mode|
+      customers(:customer_one).update(job_optimizer_id: nil) if mode.nil?
+      patch api(@stop.route.planning.id, @stop.route.id, "#{@stop.route.planning.routes[0].stops[0].id}/move/1")
+      if mode
+        assert_equal 409, last_response.status, last_response.body
+      else
+        assert_equal 204, last_response.status, last_response.body
+        assert_equal 2, @stop.reload.index
+      end
+    end
   end
 end

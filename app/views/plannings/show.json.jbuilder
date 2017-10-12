@@ -1,4 +1,4 @@
-if @planning.customer.job_optimizer
+if Job.on_planning(@planning.customer.job_optimizer, @planning.id)
   json.optimizer do
     json.extract! @planning.customer.job_optimizer, :id, :progress, :attempts
     json.error !!@planning.customer.job_optimizer.failed_at

@@ -22,6 +22,7 @@ require 'zip'
 class PlanningsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_planning, only: [:show, :edit, :update, :destroy, :move, :refresh, :switch, :automatic_insert, :update_stop, :optimize_route, :active, :duplicate, :reverse_order, :apply_zonings, :optimize]
+  before_action :check_no_existing_job, only: [:move, :refresh, :switch, :automatic_insert, :update_stop, :optimize_route, :active, :reverse_order, :apply_zonings, :optimize]
   around_action :includes_destinations, except: [:index, :show, :new, :create]
 
   load_and_authorize_resource
@@ -366,6 +367,10 @@ class PlanningsController < ApplicationController
     else
       yield
     end
+  end
+
+  def check_no_existing_job
+    raise Exceptions::JobInProgressError if Job.on_planning(@planning.customer.job_optimizer, @planning.id)
   end
 
   def planning_params

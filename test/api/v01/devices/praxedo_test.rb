@@ -62,6 +62,7 @@ class V01::Devices::PraxedoTest < ActiveSupport::TestCase
   end
 
   test 'fetch stops and update quantities' do
+    customers(:customer_one).update(job_optimizer_id: nil)
     # All 3 stops in route are completed
     # with following quantities from Praxedo:
     # 0 => 30kg / 1 => 10kg / 2 => 5kg ==> 45kg

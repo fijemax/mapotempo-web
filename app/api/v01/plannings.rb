@@ -64,8 +64,7 @@ class V01::Plannings < Grape::API
       optional :geojson, type: Symbol, values: [:true, :false, :point, :polyline], default: :false, desc: 'Fill the geojson field with route geometry: `point` to return only points, `polyline` to return with encoded linestring.'
     end
     put ':id' do
-      id = ParseIdsRefs.read(params[:id])
-      planning = current_customer.plannings.where(id).first!
+      planning = current_customer.plannings.where(ParseIdsRefs.read(params[:id])).first!
       planning.update! planning_params
       present planning, with: V01::Entities::Planning, geojson: params[:geojson]
     end
@@ -77,8 +76,7 @@ class V01::Plannings < Grape::API
     end
     delete ':id' do
       Route.includes_destinations.scoping do
-        id = ParseIdsRefs.read(params[:id])
-        current_customer.plannings.where(id).first!.destroy
+        current_customer.plannings.where(ParseIdsRefs.read(params[:id])).first!.destroy
         status 204
       end
     end
@@ -109,8 +107,8 @@ class V01::Plannings < Grape::API
     end
     get ':id/refresh' do
       Route.includes_destinations.scoping do
-        id = ParseIdsRefs.read(params[:id])
-        planning = current_customer.plannings.where(id).first!
+        planning = current_customer.plannings.where(ParseIdsRefs.read(params[:id])).first!
+        raise Exceptions::JobInProgressError if Job.on_planning(planning.customer.job_optimizer, planning.id)
         planning.compute
         planning.save!
         present planning, with: V01::Entities::Planning, geojson: params[:geojson]
@@ -129,8 +127,8 @@ class V01::Plannings < Grape::API
     end
     patch ':id/switch' do
       Route.includes_destinations.scoping do
-        planning_id = ParseIdsRefs.read(params[:id])
-        planning = current_customer.plannings.where(planning_id).first!
+        planning = current_customer.plannings.where(ParseIdsRefs.read(params[:id])).first!
+        raise Exceptions::JobInProgressError if Job.on_planning(planning.customer.job_optimizer, planning.id)
         route = planning.routes.find{ |route| route.id == Integer(params[:route_id]) }
         vehicle_usage = planning.vehicle_usage_set.vehicle_usages.find(params[:vehicle_usage_id])
 
@@ -161,7 +159,8 @@ class V01::Plannings < Grape::API
     end
     patch ':id/automatic_insert' do
       Route.includes_destinations.scoping do
-        planning = current_customer.plannings.where(ParseIdsRefs.read params[:id]).first!
+        planning = current_customer.plannings.where(ParseIdsRefs.read(params[:id])).first!
+        raise Exceptions::JobInProgressError if Job.on_planning(planning.customer.job_optimizer, planning.id)
         stops = planning.routes.flat_map{ |r| r.stops }.select{ |stop| params[:stop_ids].include?(stop.id) }
 
         begin
@@ -193,8 +192,8 @@ class V01::Plannings < Grape::API
     end
     get ':id/apply_zonings' do
       Route.includes_destinations.scoping do
-        id = ParseIdsRefs.read params[:id]
-        planning = current_customer.plannings.where(id).first!
+        planning = current_customer.plannings.where(ParseIdsRefs.read(params[:id])).first!
+        raise Exceptions::JobInProgressError if Job.on_planning(planning.customer.job_optimizer, planning.id)
         planning.zoning_outdated = true
         planning.compute
         planning.save! && planning.reload
@@ -220,8 +219,8 @@ class V01::Plannings < Grape::API
     end
     get ':id/optimize' do
       Route.includes_destinations.scoping do
-        id = ParseIdsRefs.read params[:id]
-        planning = current_customer.plannings.where(id).first!
+        planning = current_customer.plannings.where(ParseIdsRefs.read(params[:id])).first!
+        raise Exceptions::JobInProgressError if planning.customer.job_optimizer
         begin
           Optimizer.optimize(planning, nil, params[:global], params[:synchronous], params[:all_stops].nil? ? params[:active_only] : !params[:all_stops])
         rescue NoSolutionFoundError
@@ -245,8 +244,7 @@ class V01::Plannings < Grape::API
     end
     patch ':id/duplicate' do
       Route.includes_destinations.scoping do
-        id = ParseIdsRefs.read(params[:id])
-        planning = current_customer.plannings.where(id).first!
+        planning = current_customer.plannings.where(ParseIdsRefs.read(params[:id])).first!
         planning = planning.duplicate
         planning.save!(validate: false)
         present planning, with: V01::Entities::Planning, geojson: params[:geojson]
@@ -265,8 +263,8 @@ class V01::Plannings < Grape::API
     end
     patch ':id/order_array' do
       Route.includes_destinations.scoping do
-        id = ParseIdsRefs.read(params[:id])
-        planning = current_customer.plannings.where(id).first!
+        planning = current_customer.plannings.where(ParseIdsRefs.read(params[:id])).first!
+        raise Exceptions::JobInProgressError if Job.on_planning(planning.customer.job_optimizer, planning.id)
         order_array = current_customer.order_arrays.find(params[:order_array_id])
         shift = Integer(params[:shift])
         planning.apply_orders(order_array, shift)
@@ -284,9 +282,8 @@ class V01::Plannings < Grape::API
       requires :action, type: String, values: %w(toggle lock)
     end
     patch ':id/update_routes' do
-      planning_id = ParseIdsRefs.read params[:id]
-      planning = current_customer.plannings.where(planning_id).first!
-      routes = planning.routes.find params[:route_ids]
+      planning = current_customer.plannings.where(ParseIdsRefs.read(params[:id])).first!
+      routes = planning.routes.select{ |r| params[:route_ids].include? r.id }
       routes.each do |route|
         case params[:action].to_sym
           when :toggle
@@ -323,14 +320,17 @@ class V01::Plannings < Grape::API
     end
     patch ':id/update_stops_status' do
       Route.includes_destinations.scoping do
-        id = ParseIdsRefs.read params[:id]
-        planning = current_customer.plannings.where(id).first!
-        planning.fetch_stops_status
-        planning.save!
-        if params[:details]
-          present planning.routes, with: V01::Entities::RouteStatus
-        else
+        planning = current_customer.plannings.where(ParseIdsRefs.read(params[:id])).first!
+        if Job.on_planning(planning.customer.job_optimizer, planning.id)
           status 204
+        else
+          planning.fetch_stops_status
+          planning.save!
+          if params[:details]
+            present planning.routes, with: V01::Entities::RouteStatus
+          else
+            status 204
+          end
         end
       end
     end

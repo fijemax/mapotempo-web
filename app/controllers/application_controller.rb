@@ -28,6 +28,7 @@ class ApplicationController < ActionController::Base
   rescue_from ActionController::UnknownController, with: :not_found_error
   rescue_from ActiveRecord::StaleObjectError, with: :deadlock
   rescue_from PG::TRDeadlockDetected, with: :deadlock
+  rescue_from Exceptions::JobInProgressError, with: :job_in_progress
 
   layout :layout_by_resource
 
@@ -173,6 +174,16 @@ class ApplicationController < ActionController::Base
 
     respond_to do |format|
       format.json { render json: { error: I18n.t('errors.planning.deadlock') }, status: :unprocessable_entity }
+    end
+  end
+
+  def job_in_progress(exception)
+    # Display in logger
+    Rails.logger.warn(exception.class.to_s + ' : ' + exception.to_s)
+    Rails.logger.warn(exception.backtrace.join("\n"))
+
+    respond_to do |format|
+      format.json { render json: { error: I18n.t('errors.planning.job_in_progress') }, status: :unprocessable_entity }
     end
   end
 

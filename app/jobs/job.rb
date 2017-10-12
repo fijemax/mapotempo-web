@@ -28,4 +28,11 @@ class Job < Struct
       @job.save
     end.join
   end
+
+  def self.on_planning(job, planning_id)
+    if job && job.handler
+      match = job.handler.match(/planning_id: ([0-9]+)/)
+      !match || match[1].to_i == planning_id
+    end
+  end
 end

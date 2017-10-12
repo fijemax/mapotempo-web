@@ -16,6 +16,7 @@
 # <http://www.gnu.org/licenses/agpl.html>
 #
 require 'coerce'
+require 'exceptions'
 
 class V01::Routes < Grape::API
   helpers SharedParams
@@ -67,6 +68,7 @@ class V01::Routes < Grape::API
           optional :geojson, type: Symbol, values: [:true, :false, :point, :polyline], default: :false, desc: 'Fill the geojson field with route geometry: `point` to return only points, `polyline` to return with encoded linestring.'
         end
         patch ':id/active/:active' do
+          raise Exceptions::JobInProgressError if Job.on_planning(current_customer.job_optimizer, get_route.planning.id)
           get_route.active(params[:active].to_s.to_sym) && get_route.compute
           get_route.save!
           present(get_route, with: V01::Entities::Route, geojson: params[:geojson])
@@ -81,6 +83,7 @@ class V01::Routes < Grape::API
           optional :automatic_insert, type: Boolean, desc: 'If true, the best index in the route is automatically computed to have minimum impact on total route distance (without taking into account constraints like open/close, you have to start a new optimization if needed).'
         end
         patch ':id/visits/moves' do
+          raise Exceptions::JobInProgressError if Job.on_planning(current_customer.job_optimizer, get_route.planning.id)
           visits = current_customer.visits.select{ |visit| params[:visit_ids].any?{ |s| ParseIdsRefs.match(s, visit) } }
           visits_ordered = []
           params[:visit_ids].each{ |s| visits_ordered << visits.find{ |visit| ParseIdsRefs.match(s, visit) } }
@@ -94,8 +97,8 @@ class V01::Routes < Grape::API
           end
         end
 
-        desc 'Starts synchronous route optimization.',
-          detail: 'Get the shortest route in time.',
+        desc 'Optimize a single route.',
+          detail: 'Get the shortest route in time or distance.',
           nickname: 'optimizeRoute'
         params do
           requires :id, type: String, desc: ID_DESC
@@ -107,6 +110,7 @@ class V01::Routes < Grape::API
         end
         patch ':id/optimize' do
           begin
+            raise Exceptions::JobInProgressError if current_customer.job_optimizer
             if !Optimizer.optimize(get_route.planning, get_route, false, params[:synchronous], params[:all_stops].nil? ? params[:active_only] : !params[:all_stops])
               status 304
             else
@@ -130,6 +134,7 @@ class V01::Routes < Grape::API
           requires :id, type: String, desc: ID_DESC
         end
         patch ':id/reverse_order' do
+          raise Exceptions::JobInProgressError if Job.on_planning(current_customer.job_optimizer, get_route.planning.id)
           get_route and get_route.reverse_order && get_route.compute!
           get_route.save!
           present get_route, with: V01::Entities::Route

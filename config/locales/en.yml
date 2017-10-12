@@ -575,6 +575,8 @@ en:
       deadlock: 'Warning: Failed to update data. Another update was realized simultaneously,
         you may performed several operations too fast.'
       automatic_insert_no_result: No route to set stop
+      job_in_progress: Impossible to execute this operation for the moment, a background task
+        (optimization) is currently running
   import:
     csv:
       line: Line %{s}
