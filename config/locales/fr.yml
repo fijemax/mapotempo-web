@@ -1731,6 +1731,7 @@ fr:
     emissions_light_petrol: VL - Essence - %{n}
     emissions_light_diesel: VL - Gazole - %{n}
     emissions_light_lgp: VL - GPL - %{n}
+    emissions_ngv: VL - Natural gas vehicle - %{n}
     import:
       ref_vehicle: référence véhicule
       ref_desc: référence du véhicule

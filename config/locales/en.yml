@@ -1696,6 +1696,7 @@ en:
     emissions_light_petrol: Light - Petrol - %{n}
     emissions_light_diesel: Light - Diesel - %{n}
     emissions_light_lgp: Light - LGP - %{n}
+    emissions_ngv: Natural Gas Vehicle - %{n}
     import:
       ref_vehicle: reference vehicle
       ref_desc: vehicle reference
