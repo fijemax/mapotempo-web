@@ -337,6 +337,7 @@ var routerOptionsSelect = function(selectId, params) {
         checkInputFieldState($('#router_options_strict_restriction_input'), routerOptions.strict_restriction);
 
         // Car and Truck
+        checkInputFieldState($('#router_options_track_input'), routerOptions.track);
         checkInputFieldState($('#router_options_motorway_input'), routerOptions.motorway);
         checkInputFieldState($('#router_options_toll_input'), routerOptions.toll);
 

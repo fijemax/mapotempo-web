@@ -30,9 +30,9 @@ class V01::Customers < Grape::API
       p[:devices] = customer[:devices].deep_merge(p[:devices]) if customer && customer[:devices].size > 0
 
       if @current_user.admin?
-        p.permit(:ref, :name, :end_subscription, :max_vehicles, :take_over, :print_planning_annotating, :print_header, :router_id, :router_dimension, :test, :optimization_cluster_size, :optimization_time, :optimization_stop_soft_upper_bound, :optimization_vehicle_soft_upper_bound, :cost_waiting_time, :profile_id, :default_country, :reseller_id, :print_stop_time, :speed_multiplicator, :enable_references, :enable_multi_vehicle_usage_sets, :enable_multi_visits, :advanced_options, :enable_external_callback, :external_callback_url, :external_callback_name, :description, :enable_global_optimization, :enable_vehicle_position, :enable_stop_status, :optimization_force_start, router_options: [:time, :distance, :isochrone, :isodistance, :avoid_zones, :motorway, :toll, :trailers, :weight, :weight_per_axle, :height, :width, :length, :hazardous_goods, :max_walk_distance, :approach, :snap, :strict_restriction], devices: permit_recursive_params(p[:devices]))
+        p.permit(:ref, :name, :end_subscription, :max_vehicles, :take_over, :print_planning_annotating, :print_header, :router_id, :router_dimension, :test, :optimization_cluster_size, :optimization_time, :optimization_stop_soft_upper_bound, :optimization_vehicle_soft_upper_bound, :cost_waiting_time, :profile_id, :default_country, :reseller_id, :print_stop_time, :speed_multiplicator, :enable_references, :enable_multi_vehicle_usage_sets, :enable_multi_visits, :advanced_options, :enable_external_callback, :external_callback_url, :external_callback_name, :description, :enable_global_optimization, :enable_vehicle_position, :enable_stop_status, :optimization_force_start, router_options: [:time, :distance, :isochrone, :isodistance, :avoid_zones, :track, :motorway, :toll, :trailers, :weight, :weight_per_axle, :height, :width, :length, :hazardous_goods, :max_walk_distance, :approach, :snap, :strict_restriction], devices: permit_recursive_params(p[:devices]))
       else
-        p.permit(:take_over, :print_planning_annotating, :print_header, :router_id, :router_dimension, :default_country, :print_stop_time, :speed_multiplicator, :advanced_options, :enable_external_callback, :external_callback_url, :external_callback_name, :optimization_force_start, router_options: [:time, :distance, :isochrone, :isodistance, :avoid_zones, :motorway, :toll, :trailers, :weight, :weight_per_axle, :height, :width, :length, :hazardous_goods, :max_walk_distance, :approach, :snap, :strict_restriction], devices: permit_recursive_params(p[:devices]))
+        p.permit(:take_over, :print_planning_annotating, :print_header, :router_id, :router_dimension, :default_country, :print_stop_time, :speed_multiplicator, :advanced_options, :enable_external_callback, :external_callback_url, :external_callback_name, :optimization_force_start, router_options: [:time, :distance, :isochrone, :isodistance, :avoid_zones, :track, :motorway, :toll, :trailers, :weight, :weight_per_axle, :height, :width, :length, :hazardous_goods, :max_walk_distance, :approach, :snap, :strict_restriction], devices: permit_recursive_params(p[:devices]))
       end
     end
 
@@ -104,6 +104,7 @@ class V01::Customers < Grape::API
       )
 
       optional :router_options, type: Hash do
+        optional :track, type: Boolean
         optional :motorway, type: Boolean
         optional :toll, type: Boolean
         optional :trailers, type: Integer
@@ -157,6 +158,7 @@ class V01::Customers < Grape::API
       )
 
       optional :router_options, type: Hash do
+        optional :track, type: Boolean
         optional :motorway, type: Boolean
         optional :toll, type: Boolean
         optional :trailers, type: Integer

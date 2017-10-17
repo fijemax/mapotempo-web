@@ -136,6 +136,7 @@ fr:
         router: Calculateur d'itinéraire
         router_id: Calculateur d'itinéraire
         router_dimension: Objectif du calculateur
+        router_options_track: Utiliser les chemins
         router_options_motorway: Utiliser les autoroutes
         router_options_toll: Autoriser les sections à péage
         router_options_trailers: Nombre de remorques
@@ -701,6 +702,9 @@ fr:
       optimization_parameters: Paramètres d'optimisation
       router_help: Profil utilisé pour les calculs d'itinéraires par défaut
       router_options_default: '%{n} (valeur par défaut)'
+      router_options_track_yes: Oui
+      router_options_track_no: Non
+      router_options_track_default: Par défaut (%{value})
       router_options_motorway_yes: Oui
       router_options_motorway_no: Non
       router_options_motorway_default: Par défaut (%{value})

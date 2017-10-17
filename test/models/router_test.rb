@@ -80,6 +80,7 @@ class RouterTest < ActiveSupport::TestCase
         isochrone: true,
         isodistance: true,
         avoid_zones: true,
+        track: true,
         motorway: true,
         toll: true,
         trailers: true,
@@ -111,6 +112,9 @@ class RouterTest < ActiveSupport::TestCase
 
     assert router.avoid_zones, true
     assert router.avoid_zones?, true
+
+    assert router.track, true
+    assert router.track?, true
 
     assert router.motorway, true
     assert router.motorway?, true

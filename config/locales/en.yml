@@ -136,7 +136,8 @@ en:
         router: Routing Engine
         router_id: Routing Engine
         router_dimension: Router objective
-        router_options_motorway: Use motorway
+        router_options_track: Use tracks
+        router_options_motorway: Use motorways
         router_options_toll: Authorize toll sections
         router_options_trailers: Number of trailers pulled by the vehicle
         router_options_weight: Vehicle weight
@@ -696,6 +697,9 @@ en:
       optimization_parameters: Optimization settings
       router_help: Profile used by route plan by default
       router_options_default: '%{n} (default value)'
+      router_options_track_yes: 'Yes'
+      router_options_track_no: 'No'
+      router_options_track_default: By default (%{value})
       router_options_motorway_yes: 'Yes'
       router_options_motorway_no: 'No'
       router_options_motorway_default: By default (%{value})

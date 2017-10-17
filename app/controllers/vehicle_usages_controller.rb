@@ -107,6 +107,7 @@ class VehicleUsagesController < ApplicationController
                                                                :isochrone,
                                                                :isodistance,
                                                                :avoid_zones,
+                                                               :track,
                                                                :motorway,
                                                                :toll,
                                                                :trailers,

@@ -182,6 +182,7 @@ class CustomerTest < ActiveSupport::TestCase
         isochrone: true,
         isodistance: true,
         avoid_zones: true,
+        track: true,
         motorway: true,
         toll: true,
         trailers: 2,
@@ -213,6 +214,9 @@ class CustomerTest < ActiveSupport::TestCase
 
     assert_equal customer.avoid_zones, true
     assert_equal customer.avoid_zones?, true
+
+    assert_equal customer.track, true
+    assert_equal customer.track?, true
 
     assert_equal customer.motorway, true
     assert_equal customer.motorway?, true

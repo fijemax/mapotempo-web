@@ -66,6 +66,29 @@
           </div>
         </div>
 
+        <div id="router_options_track_input" class="form-group <%= @vehicle_usage.vehicle.default_router.track? ? '' : 'router-option-disabled' %>">
+          <label class="col-md-2 control-label" for="vehicle_usage_vehicle_router_options_track">
+            <%= t('activerecord.attributes.customer.router_options_track') %>
+          </label>
+
+          <div class="col-md-6 input-append form-inline">
+            <label>
+              <input type="radio" name="vehicle_usage[vehicle][router_options][track]" id="vehicle_usage_vehicle_router_options_track_yes" value="true" <%= @vehicle_usage.vehicle.router_options['track'] == 'true' ? 'checked' : '' %>/>
+              <%= t('customers.form.router_options_track_yes') %>
+            </label>
+
+            <label>
+              <input type="radio" name="vehicle_usage[vehicle][router_options][track]" id="vehicle_usage_vehicle_router_options_track_no" value="false" <%= @vehicle_usage.vehicle.router_options['track'] == 'false' ? 'checked' : '' %>/>
+              <%= t('customers.form.router_options_track_no') %>
+            </label>
+
+            <label class="pull-right">
+              <input type="radio" name="vehicle_usage[vehicle][router_options][track]" id="vehicle_usage_vehicle_router_options_track_default" value="" <%= @vehicle_usage.vehicle.router_options['track'].nil? && 'checked' %>/>
+              <%= t('customers.form.router_options_track_default', value: @vehicle_usage.vehicle.customer.router_options['track'] == 'false' ? t('customers.form.router_options_track_no') : t('customers.form.router_options_track_yes')) %>
+            </label>
+          </div>
+        </div>
+
         <div id="router_options_motorway_input" class="form-group <%= @vehicle_usage.vehicle.default_router.motorway? ? '' : 'router-option-disabled' %>">
           <label class="col-md-2 control-label" for="vehicle_usage_vehicle_router_options_motorway">
             <%= t('activerecord.attributes.customer.router_options_motorway') %>

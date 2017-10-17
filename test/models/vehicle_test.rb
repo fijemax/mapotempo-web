@@ -31,6 +31,7 @@ class VehicleTest < ActiveSupport::TestCase
         isochrone: true,
         isodistance: true,
         avoid_zones: true,
+        track: true,
         motorway: true,
         toll: true,
         trailers: 2,
@@ -62,6 +63,9 @@ class VehicleTest < ActiveSupport::TestCase
 
     assert_equal vehicle.avoid_zones, true
     assert_equal vehicle.avoid_zones?, true
+
+    assert_equal vehicle.track, true
+    assert_equal vehicle.track?, true
 
     assert_equal vehicle.motorway, true
     assert_equal vehicle.motorway?, true

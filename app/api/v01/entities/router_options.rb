@@ -20,6 +20,7 @@ class V01::Entities::RouterOptions < Grape::Entity
     'V01_RouterOptions'
   end
 
+  expose(:track, documentation: { type: 'Boolean' }) { |m| m['track'] }
   expose(:motorway, documentation: { type: 'Boolean' }) { |m| m['motorway'] }
   expose(:toll, documentation: { type: 'Boolean' }) { |m| m['toll'] }
   expose(:trailers, documentation: { type: Integer }) { |m| m['trailers'] }

@@ -48,6 +48,24 @@
       </div>
     </div>
 
+    <div id="router_options_track_input" class="form-group <%= @customer.router.try(&:track?) ? '' : 'router-option-disabled' %>">
+      <label class="col-md-2 control-label" for="customer_router_options_track">
+        <%= t('activerecord.attributes.customer.router_options_track') %>
+      </label>
+
+      <div class="col-md-6 input-append form-inline">
+        <label>
+          <input type="radio" name="customer[router_options][track]" id="customer_router_options_track_yes" value="true" <%= @customer.router_options['track'] == 'false' ? '' : 'checked' %>/>
+          <%= t('customers.form.router_options_track_yes') %>
+        </label>
+
+        <label>
+          <input type="radio" name="customer[router_options][track]" id="customer_router_options_track_no" value="false" <%= @customer.router_options['track'] == 'false' ? 'checked' : '' %>/>
+          <%= t('customers.form.router_options_track_no') %>
+        </label>
+      </div>
+    </div>
+
     <div id="router_options_motorway_input" class="form-group <%= @customer.router.try(&:motorway?) ? '' : 'router-option-disabled' %>">
       <label class="col-md-2 control-label" for="customer_router_options_motorway">
         <%= t('activerecord.attributes.customer.router_options_motorway') %>

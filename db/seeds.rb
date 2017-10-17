@@ -13,13 +13,13 @@ car = RouterWrapper.create!(
     name: 'RouterWrapper-Car',
     name_locale: {fr: 'Calculateur pour voiture', en: 'Car router'},
     url_time: 'http://localhost:9090',
-    options: {time: true, distance: true, avoid_zones: false, isochrone: true, isodistance: true, approach: true, snap: true})
+    options: {time: true, distance: true, avoid_zones: false, isochrone: true, isodistance: true, approach: true, track: true, motorway: true})
 car_urban = RouterWrapper.create!(
     mode: 'car_urban',
     name: 'RouterWrapper-Car-Urban',
     name_locale: {fr: 'Calculateur pour voiture urbaine', en: 'Urban car router'},
     url_time: 'http://localhost:9090',
-    options: {time: true, distance: true, avoid_zones: false, isochrone: true, isodistance: true, approach: true, snap: true})
+    options: {time: true, distance: true, avoid_zones: false, isochrone: true, isodistance: true, approach: true, track: true, motorway: true})
 bicycle = RouterWrapper.create!(
     mode: 'bicycle',
     name: 'RouterWrapper-Bicycle',

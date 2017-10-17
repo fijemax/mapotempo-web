@@ -17,6 +17,7 @@ router_one:
     isochrone: true
     isodistance: true
     avoid_zones: true
+    track: true
     motorway: true
     toll: true
     trailers: true
