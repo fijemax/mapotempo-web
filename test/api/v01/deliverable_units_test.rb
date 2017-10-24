@@ -50,6 +50,33 @@ class V01::DeliverableUnitsTest < ActiveSupport::TestCase
     end
   end
 
+  test 'should create a deliverable unit with negative quantity' do
+    assert_difference('DeliverableUnit.count', 1) do
+      @deliverable_unit.label = 'new label'
+      @deliverable_unit.default_quantity = -1.2
+      post api(), @deliverable_unit.attributes.merge({ref: 'other_ref'})
+      assert last_response.created?, last_response.body
+      assert -1.2, JSON.parse(last_response.body)['default_quantity']
+    end
+  end
+
+  test 'should not create a deliverable unit with negative capacity' do
+    @deliverable_unit.label = 'new label'
+    @deliverable_unit.default_capacity = -1.2
+    post api(), @deliverable_unit.attributes
+    assert_equal 400, last_response.status, 'Bad response: ' + last_response.body
+  end
+
+  test 'should create a deliverable unit with positive capacity' do
+    assert_difference('DeliverableUnit.count', 1) do
+      @deliverable_unit.label = 'new label'
+      @deliverable_unit.default_capacity = 1.2
+      post api(), @deliverable_unit.attributes.merge({ref: 'other_ref'})
+      assert last_response.created?, last_response.body
+      assert 1.2, JSON.parse(last_response.body)['default_capacity']
+    end
+  end
+
   test 'should update a deliverable unit' do
     @deliverable_unit.label = 'new label'
     put api(@deliverable_unit.id), label: 'riri', icon: 'fa-home'

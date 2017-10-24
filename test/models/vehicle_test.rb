@@ -140,6 +140,13 @@ class VehicleTest < ActiveSupport::TestCase
     assert_nil Vehicle.where(name: :vehicle_one).first.capacities[customers(:customer_one).deliverable_units[0].id]
   end
 
+  test 'should not accept negative value for capacity' do
+    vehicle = vehicles(:vehicle_one)
+    assert_not vehicle.vehicle_usages[0].routes[-1].outdated
+    vehicle.capacities = {customers(:customer_one).deliverable_units[0].id => '-12,3'}
+    assert !vehicle.save
+  end
+
   test 'should update geojson if color changed' do
     vehicle = vehicles(:vehicle_one)
     vehicle.color = '#123123' # Some visits are tagged with #FF0000

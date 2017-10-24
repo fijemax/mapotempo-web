@@ -20,7 +20,7 @@ module VisitsHelper
   def visit_quantities(visit, vehicle, options = {})
     visit.destination.customer.deliverable_units.map{ |du|
       quantities = visit.default_quantities
-      if quantities && quantities[du.id] && quantities[du.id] > 0
+      if quantities && quantities[du.id] && quantities[du.id] != 0
         {
           deliverable_unit_id: du.id,
           quantity: number_with_precision(!options[:with_default] ? quantities[du.id] : quantities && quantities[du.id] && Visit.localize_numeric_value(quantities[du.id]) + (vehicle && vehicle.default_capacities[du.id] ? '/' + Visit.localize_numeric_value(vehicle.default_capacities[du.id]) : ''), strip_insignificant_zeros: true).to_s + (du.label ? "\u202F" + du.label : ''),

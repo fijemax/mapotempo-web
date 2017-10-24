@@ -18,12 +18,36 @@ class DeliverableUnitTest < ActiveSupport::TestCase
     assert_nil unit.localized_default_quantity
   end
 
+  test 'should create with negative quantity' do
+    unit = customers(:customer_one).deliverable_units.build(label: 'plop', default_quantity: '-1,2')
+    assert unit.save
+    assert_equal -1.2, unit.default_quantity
+  end
+
+  test 'should not create with negative capacity' do
+    unit = customers(:customer_one).deliverable_units.build(label: 'plop', default_capacity: '-1,2')
+    assert !unit.save
+  end
+
   test 'should update' do
     unit = deliverable_units(:deliverable_unit_one_one)
     unit.default_capacity = ''
     assert unit.save
     assert_nil unit.default_capacity
     assert_nil unit.localized_default_capacity
+  end
+
+  test 'should update with negative quantity' do
+    unit = deliverable_units(:deliverable_unit_one_one)
+    unit.default_quantity = '-2,3'
+    assert unit.save
+    assert_equal -2.3, unit.default_quantity
+  end
+
+  test 'should not update with negative capacity' do
+    unit = deliverable_units(:deliverable_unit_one_one)
+    unit.default_capacity = '-2,3'
+    assert !unit.save
   end
 
   test 'should save with localized attributes' do

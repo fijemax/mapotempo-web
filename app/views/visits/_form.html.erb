@@ -27,7 +27,7 @@
         <div class="col-md-6">
           <% visit.destination.customer.deliverable_units.each do |du| %>
           <div class="input-group">
-            <%= number_field "destination[visits_attributes][#{i}][quantities]", du.id, value: visit.quantities && visit.quantities[du.id], placeholder: du.default_quantity && t('.quantities.default', n: du.localized_default_quantity), class: 'form-control width_1_2', step: 'any', min: 0 %>
+            <%= number_field "destination[visits_attributes][#{i}][quantities]", du.id, value: visit.quantities && visit.quantities[du.id], placeholder: du.default_quantity && t('.quantities.default', n: du.localized_default_quantity), class: 'form-control width_1_2', step: 'any' %>
             <%= text_field "destination[visits_attributes][#{i}][quantities_unit]", du.id, value: du.label, class: 'form-control width_1_2', placeholder: t('deliverable_units.form.label_placeholder'), disabled: true %>
             <span class="input-group-addon"><i class="fa <%= du.default_icon %> fa-fw"></i></span>
           </div>

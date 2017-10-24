@@ -27,7 +27,7 @@ class DeliverableUnit < ApplicationRecord
 
   nilify_blanks before: :validation
   auto_strip_attributes :label
-  validates :default_quantity, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :default_quantity, numericality: true, allow_nil: true
   validates :default_capacity, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :optimization_overload_multiplier, numericality: { greater_than_or_equal_to: -1 }, allow_nil: true
   validates :ref, uniqueness: { scope: :customer_id, case_sensitive: true }, allow_nil: true, allow_blank: true

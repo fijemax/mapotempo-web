@@ -209,7 +209,8 @@ class Route < ApplicationRecord
                   quantities_[du.id] = (quantities_[du.id] || 0) + (stop.visit.default_quantities[du.id] || 0)
                 }
                 stop.out_of_capacity = stop.route.planning.customer.deliverable_units.any?{ |du|
-                  vehicle_usage.vehicle.default_capacities[du.id] && quantities_[du.id] > vehicle_usage.vehicle.default_capacities[du.id]
+                  (vehicle_usage.vehicle.default_capacities[du.id] && quantities_[du.id] > vehicle_usage.vehicle.default_capacities[du.id]) ||
+                    quantities_[du.id] < 0 # FIXME with initial quantity
                 }
               end
             else

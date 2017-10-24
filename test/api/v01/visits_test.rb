@@ -79,6 +79,31 @@ class V01::VisitsTest < ActiveSupport::TestCase
     end
   end
 
+  test 'should create a visit with negative quantity' do
+    # tags can be a string separated by comma or an array
+    [
+      tags(:tag_one).id.to_s + ',' + tags(:tag_two).id.to_s,
+      [tags(:tag_one).id, tags(:tag_two).id]
+    ].each do |tags|
+      assert_difference('Visit.count', 1) do
+        assert_difference('Stop.count', 2) do
+          post api_destination(@destination.id), @visit.attributes.merge({tag_ids: tags, 'quantities' => [{deliverable_unit_id: 1, quantity: -3.5}]}).except('id').to_json, 'CONTENT_TYPE' => 'application/json'
+
+          assert last_response.created?, last_response.body
+          visit = JSON.parse last_response.body
+          assert_equal 2, visit['tag_ids'].size
+          assert_equal -3.5, visit['quantities'][0]['quantity']
+          assert_equal '10:00:00', visit['open']
+          assert_equal '11:00:00', visit['close']
+          assert_equal '10:00:00', visit['open1']
+          assert_equal '11:00:00', visit['close1']
+          assert_equal '00:05:33', visit['take_over']
+          assert_equal '00:05:00', visit['take_over_default']
+        end
+      end
+    end
+  end
+
   test 'should create a visit with none tag' do
     ['', nil, []].each do |tags|
       assert_difference('Visit.count', 1) do
@@ -113,12 +138,21 @@ class V01::VisitsTest < ActiveSupport::TestCase
   end
 
   test 'should update a visit with quantities or return parse error' do
+
+
     put api_destination(@destination.id, @visit.id), { quantities: [{ deliverable_unit_id: 1, quantity: 10 }] }.to_json, 'CONTENT_TYPE' => 'application/json'
     assert last_response.ok?, last_response.body
 
     visit = JSON.parse(last_response.body)
     assert visit['quantities'][0]['deliverable_unit_id'], 1
     assert visit['quantities'][0]['quantity'], 10
+
+    put api_destination(@destination.id, @visit.id), { quantities: [{ deliverable_unit_id: 1, quantity: -10 }] }.to_json, 'CONTENT_TYPE' => 'application/json'
+    assert last_response.ok?, last_response.body
+
+    visit = JSON.parse(last_response.body)
+    assert visit['quantities'][0]['deliverable_unit_id'], 1
+    assert visit['quantities'][0]['quantity'], -10
 
     put api_destination(@destination.id, @visit.id), { quantities: [{ deliverable_unit: 1, quantity: 'aaa' }] }.to_json, 'CONTENT_TYPE' => 'application/json'
     assert last_response.bad_request?

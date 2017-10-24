@@ -72,11 +72,10 @@ class Visit < ApplicationRecord
   # Custom validator for quantities. Mostly used by the destination model (:update, :create)
   def quantities_validator
     !quantities || quantities.values.each do |q|
-      raise Exceptions::NegativeErrors.new(q, id, nested_attr: :quantities, record: self) if Float(q) < 0 # Raise both Float && NegativeErrors type
+      Float(q);
     end
   rescue StandardError => e
     self.errors.add :quantities, :not_float if e.is_a?(ArgumentError) || e.is_a?(TypeError)
-    self.errors.add(:quantities, :negative_value, value: e.object[:value]) if e.is_a?(Exceptions::NegativeErrors)
   end
 
   def destroy
@@ -122,7 +121,7 @@ class Visit < ApplicationRecord
   end
 
   def default_quantities?
-    default_quantities && default_quantities.values.any?{ |q| q && q > 0 }
+    default_quantities && default_quantities.values.any?{ |q| q }
   end
 
   def quantities?
