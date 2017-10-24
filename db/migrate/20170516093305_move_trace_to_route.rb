@@ -10,6 +10,11 @@ class MoveTraceToRoute < ActiveRecord::Migration
     Route.connection.schema_cache.clear!
     Route.reset_column_information
 
+    StopVisit.class_eval do
+      def icon_size
+      end
+    end
+
     route_updated_at_copy = column_exists? :routes, :updated_at_copy
     stop_updated_at_copy = column_exists? :stops, :updated_at_copy
     new_routes = route_updated_at_copy ? "updated_at_copy IS NULL OR (updated_at - interval '10 seconds' > updated_at_copy)" : 'true'
