@@ -146,6 +146,9 @@ en:
           help: "Allows sending routes to Notico Deliv application."
         praxedo:
           help: "Allows sending routes to Praxedo application."
+        mapotempo_fleet:
+          help: "(DEMO ONY) Simulate vehicles' position and visit status (if these options are activated)
+            for the last updated plan."
   plannings:
     edit:
       teksat_send:
@@ -216,6 +219,14 @@ en:
         action: Clear Praxedo
         success: Praxedo interventions have been cleared successfully
         fail: Failed to clear Praxedo interventions
+      mapotempo_fleet_send:
+        action: Send to Mapotempo Fleet
+        success: Sent to Mapotempo Fleet successfully
+        fail: Failed to send to Mapotempo Fleet
+      mapotempo_fleet_clear:
+        action: Clear Mapotempo Fleet
+        success: Mapotempo Fleet interventions have been cleared successfully
+        fail: Failed to clear Mapotempo Fleet interventions
       dialog:
         orange:
           title: Orange Fleet Performance
@@ -240,4 +251,7 @@ en:
           in_progress: Please wait
         praxedo:
           title: Praxedo
+          in_progress: Please wait
+        mapotempo_fleet:
+          title: Mapotempo Fleet
           in_progress: Please wait

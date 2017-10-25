@@ -11,7 +11,7 @@ require_relative '../lib/optim/optimizer_wrapper'
 require_relative '../lib/exceptions'
 
 require_relative '../lib/devices/device_base'
-['alyacom', 'masternaut', 'orange', 'teksat', 'tomtom', 'trimble', 'locster', 'suivi_de_flotte', 'notico', 'praxedo'].each{|name|
+['alyacom', 'masternaut', 'orange', 'teksat', 'tomtom', 'trimble', 'locster', 'suivi_de_flotte', 'notico', 'praxedo', 'mapotempo_fleet'].each{|name|
   require_relative "../lib/devices/#{name}"
 }
 
@@ -99,7 +99,8 @@ module Mapotempo
       locster: Locster.new,
       suivi_de_flotte: SuiviDeFlotte.new,
       notico: Notico.new,
-      praxedo: Praxedo.new
+      praxedo: Praxedo.new,
+      mapotempo_fleet: MapotempoFleet.new
     )
 
     # Warn for plannings limitation in coming

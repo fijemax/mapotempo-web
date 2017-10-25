@@ -193,9 +193,9 @@ var devicesObserveCustomer = (function() {
       var inputs = $('input[type="text"], input[type="password"]', '#' + config.name + '_container');
       inputs.each(function() {
         if ($(this).val() == '')
-          return isNotEmpty = false;
+          isNotEmpty = false;
       });
-      return isNotEmpty;
+      return inputs.length && isNotEmpty ? true : false;
     }
 
     function _ajaxCall(all) {

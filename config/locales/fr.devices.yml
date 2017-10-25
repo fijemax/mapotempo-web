@@ -148,6 +148,9 @@ fr:
           help: "Permet d'envoyer les tournées vers l'application Notico Deliv."
         praxedo:
           help: "Permet d'envoyer les tournées vers l'application Praxedo."
+        mapotempo_fleet:
+          help: "(DEMONSTRATEUR) Simule la position des véhicules et le statut des visites (si ces options sont actives)
+            pour le dernier plan modifié."
   plannings:
     edit:
       teksat_send:
@@ -218,6 +221,14 @@ fr:
         action: Vider Praxedo
         success: Les interventions Praxedo ont été vidées avec succès
         fail: Échec lors de la suppression des interventions Praxedo
+      mapotempo_fleet_send:
+        action: Envoyer à Mapotempo Fleet
+        success: Envoyé à Mapotempo Fleet avec succès
+        fail: Échec lors de l'envoi vers Mapotempo Fleet
+      mapotempo_fleet_clear:
+        action: Vider Mapotempo Fleet
+        success: Les interventions Mapotempo Fleet ont été vidées avec succès
+        fail: Échec lors de la suppression des interventions Mapotempo Fleet
       dialog:
         orange:
           title: Orange Fleet Performance
@@ -242,4 +253,7 @@ fr:
           in_progress: Veuillez patienter
         praxedo:
           title: Praxedo
+          in_progress: Veuillez patienter
+        mapotempo_fleet:
+          title: Mapotempo Fleet
           in_progress: Veuillez patienter

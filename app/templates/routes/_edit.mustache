@@ -139,6 +139,17 @@
               </li>
               <li role="separator" class="divider"></li>
             {{/praxedo}}
+            {{#mapotempo_fleet}}
+              <li class="link device-operation" data-service="mapotempo_fleet" data-operation="send" data-route-id="{{route_id}}">
+                  <i class="fa fa-mobile fa-rotate-90 fa-fw"></i>
+                  {{#i18n}}plannings.edit.mapotempo_fleet_send.action{{/i18n}}
+              </li>
+              <li class="link device-operation" data-service="mapotempo_fleet" data-operation="clear" data-route-id="{{route_id}}">
+                  <i class="fa fa-mobile fa-rotate-90 fa-fw"></i>
+                  {{#i18n}}plannings.edit.mapotempo_fleet_clear.action{{/i18n}}
+              </li>
+              <li role="separator" class="divider"></li>
+            {{/mapotempo_fleet}}
             <li><a href="/routes/{{route_id}}"><i class="fa fa-print fa-fw"></i> {{#i18n}}plannings.edit.export.print{{/i18n}}</a></li>
             <li role="separator" class="divider"></li>
             <li><a class="export_spreadsheet"><i class="fa fa-table fa-fw"></i> {{#i18n}}plannings.edit.export.spreadsheet{{/i18n}}</a></li>
