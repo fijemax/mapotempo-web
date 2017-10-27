@@ -59,7 +59,7 @@ class Vehicle < ApplicationRecord
 
   def capacities_validator
     !capacities || capacities.values.each do |q|
-      raise Exceptions::NegativeErrors.new(q, id) if Float(q) < 0; # Raise both Float && NegativeErrors type
+      raise Exceptions::NegativeErrors.new(q, id) if Float(q) < 0 # Raise both Float && NegativeErrors type
     end
   rescue StandardError => e
     errors.add :capacities, :not_float if e.is_a?(ArgumentError) || e.is_a?(TypeError)

@@ -109,6 +109,17 @@ class VehicleTest < ActiveSupport::TestCase
     assert_equal vehicle.default_router_options['max_walk_distance'], '200'
   end
 
+  test 'should return error if capacity is invalid' do
+    vehicle = vehicles(:vehicle_one)
+
+    vehicle.capacities = {customers(:customer_one).deliverable_units[0].id => '12,3'}
+    assert vehicle.save
+
+    vehicle.capacities = {customers(:customer_one).deliverable_units[0].id => 'not a float'}
+    assert_not vehicle.save
+    assert_equal vehicle.errors.first.second, I18n.t('activerecord.errors.models.vehicle.attributes.capacities.not_float')
+  end
+
   test 'should update outdated for capacity' do
     vehicle = vehicles(:vehicle_one)
     assert_not vehicle.vehicle_usages[0].routes[-1].outdated

@@ -30,7 +30,13 @@ class DeliverableUnitQuantity
 
   def initialize(quantities)
     @quantities = quantities ? Hash[quantities.map{ |k, v|
-      v && !v.empty? ? [Integer(k), v && Float(v)] : nil
+      if v && !v.empty?
+        # float value will be validated by the model
+        value = Float(v) rescue v
+        [Integer(k), value]
+      else
+        nil
+      end
     }.compact] : {}
   end
 

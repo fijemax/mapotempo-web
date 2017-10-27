@@ -179,6 +179,17 @@ class VisitTest < ActiveSupport::TestCase
     assert_nil visit.icon
   end
 
+  test 'should return error if quantity is invalid' do
+    visit = visits(:visit_one)
+
+    visit.quantities = {customers(:customer_one).deliverable_units[0].id => '12,3'}
+    assert visit.save
+
+    visit.quantities = {customers(:customer_one).deliverable_units[0].id => 'not a float'}
+    assert_not visit.save
+    assert_equal visit.errors.first.second, I18n.t('activerecord.errors.models.visit.attributes.quantities.not_float')
+  end
+
   test 'should update outdated for quantity' do
     visit = visits :visit_one
     assert_not visit.stop_visits[-1].route.outdated
