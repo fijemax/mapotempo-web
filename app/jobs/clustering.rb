@@ -65,9 +65,6 @@ class Clustering
     if clusters_flatten.empty?
       []
     else
-      min, max = clusters_flatten.minmax_by{ |i| i[0] }
-      buffer = [(max[0] - min[0]) * 0.002, 1e-04].max
-
       factory = Cartesian.preferred_factory
 
       multi_points = clusters.collect{ |cluster|
@@ -76,8 +73,11 @@ class Clustering
         })
       }
 
-      clusters.size.times.collect{ |i|
-        hull(factory, clusters[i], multi_points[i], (i > 0 ? multi_points[0..i - 1] : []) + multi_points[i + 1..multi_points.length - 1], buffer)
+      clusters.each_with_index.map{ |cluster, i|
+        lat_min, lat_max = cluster.minmax_by{ |i| i[0] }.map{ |i| i[0] }
+        lng_min, lng_max = cluster.minmax_by{ |i| i[1] }.map{ |i| i[1] }
+        buffer = [[(lat_max - lat_min), (lng_max - lng_min)].min * 0.02, 1e-04].max
+        hull(factory, cluster, multi_points[i], (i > 0 ? multi_points[0..i - 1] : []) + multi_points[i + 1..multi_points.length - 1], buffer)
       }
     end
   end
