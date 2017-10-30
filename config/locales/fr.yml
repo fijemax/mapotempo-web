@@ -163,6 +163,7 @@ fr:
         enable_global_optimization: Activer l'optimisation globale
         test: Test
         jobs: Tâches
+        optimization_max_split_size: Découper le problème
         optimization_cluster_size: Taille des clusters d'optimisation
         optimization_time: Temps d'optimisation maximum par véhicule
         optimization_stop_soft_upper_bound: Coefficient retards / arrêts
@@ -729,9 +730,16 @@ fr:
         les interdictions au plus près et passera outre l'interdiction uniquement
         s'il ne peut pas faire autrement.
       take_over_help: Durée de visite moyenne par client
+      optimization_max_split_size_default: '%{n} (valeur par défaut)'
+      optimization_max_split_size_help: Nombre de points maximal à regrouper dans le cas
+        d'un problème à optimiser trop gros. Plus la valeur est grande, meilleur le résultat
+        de l'optimisation sera (mais il est alors plus fréquent que le problème soit trop
+        complexe pour trouver une solution dans les temps impartis). Plus la valeur est
+        faible, et plus l'optimisation trouvera une solution rapidement (mais la solution
+        trouvée peut être de moins bonne qualité).
       optimization_cluster_size_default: '%{n} (valeur par défaut)'
       optimization_cluster_size_help: Valeur en secondes séparant les points à regrouper
-        entre eux avant de les optimiser. Une valeur trop grande affectera la qualité
+        entre eux avant de les optimiser. Une valeur trop grande dégradera la qualité
         de l'optimisation (30 sec est une grande valeur). Valable uniquement dans
         le cas d'une optimisation d'une seule tournée avec retards.
       optimization_time_default: '%{n} (valeur par défaut)'

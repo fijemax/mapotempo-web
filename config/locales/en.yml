@@ -162,6 +162,7 @@ en:
         enable_global_optimization: Enable global optimization
         test: Test
         jobs: Jobs
+        optimization_max_split_size: Optimization split size
         optimization_cluster_size: Optimization cluster size
         optimization_time: Maximum optimization time by vehicle
         optimization_stop_soft_upper_bound: Stops delay coefficient
@@ -723,6 +724,12 @@ en:
       router_options_strict_restriction: If not checked the router will try to strictly
         respect the limitations and override limitations only if it's the only way.
       take_over_help: Average time per account
+      optimization_max_split_size_default: '%{n} (default value)'
+      optimization_max_split_size_help: Maximum number of points to group in case problem
+        is too much heavy to optimize. Greater the value is, better the result of
+        optimization will be (but no solution found for the problem within available time
+        could occur more often). Smaller the value is, faster the optimization will be (but
+        solution coulb be with less quality).
       optimization_cluster_size_default: '%{n} (default value)'
       optimization_cluster_size_help: Value in seconds between points to group before
         optimization. A great value will degrade optimization result (30 sec is already

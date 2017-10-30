@@ -305,6 +305,9 @@
       <legend class="scheduler-border">
         <%= t '.optimization_parameters' %>
       </legend>
+      <%= f.number_field :optimization_max_split_size, { placeholder: t('.optimization_max_split_size_default', n: LocalizedValues.localize_numeric_value(Mapotempo::Application.config.optimize_max_split_size)), min: 0, input_group: content_tag('i', '', class: 'fa fa-gears fa-fw')} do %>
+        <p class="help-block"><%= t '.optimization_max_split_size_help' %></p>
+      <% end %>
       <%= f.number_field :optimization_cluster_size, { placeholder: t('.optimization_cluster_size_default', n: LocalizedValues.localize_numeric_value(Mapotempo::Application.config.optimize_cluster_size)), min: 0, input_group: t('all.unit.second')} do %>
         <p class="help-block"><%= t '.optimization_cluster_size_help' %></p>
       <% end %>

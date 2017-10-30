@@ -132,6 +132,7 @@ class OptimizerWrapper
         }],
         configuration: {
           preprocessing: {
+            max_split_size: options[:max_split_size],
             cluster_threshold: options[:cluster_threshold],
             prefer_short_segment: true
           },

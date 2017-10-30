@@ -21,9 +21,10 @@ require 'optimizer_job'
 class Optimizer
   @@optimize_time = Mapotempo::Application.config.optimize_time
   @@optimize_time_force = Mapotempo::Application.config.optimize_time_force
+  @@max_split_size = Mapotempo::Application.config.optimize_max_split_size
   @@stop_soft_upper_bound = Mapotempo::Application.config.optimize_stop_soft_upper_bound
   @@vehicle_soft_upper_bound = Mapotempo::Application.config.optimize_vehicle_soft_upper_bound
-  @@optimization_cluster_size = Mapotempo::Application.config.optimize_cluster_size
+  @@cluster_size = Mapotempo::Application.config.optimize_cluster_size
   @@cost_waiting_time = Mapotempo::Application.config.cost_waiting_time
   @@force_start = Mapotempo::Application.config.optimize_force_start
 
@@ -51,9 +52,10 @@ class Optimizer
           Mapotempo::Application.config.optimize.optimize(
             positions, services, vehicles,
             optimize_time: @@optimize_time_force || (optimize_time ? optimize_time * 1000 : nil),
+            max_split_size: planning.customer.optimization_max_split_size || @@max_split_size,
             stop_soft_upper_bound: planning.customer.optimization_stop_soft_upper_bound || @@stop_soft_upper_bound,
             vehicle_soft_upper_bound: planning.customer.optimization_vehicle_soft_upper_bound || @@vehicle_soft_upper_bound,
-            cluster_threshold: planning.customer.optimization_cluster_size || @@optimization_cluster_size,
+            cluster_threshold: planning.customer.cluster_size || @@cluster_size,
             cost_waiting_time: planning.customer.cost_waiting_time || @@cost_waiting_time,
             force_start: planning.customer.optimization_force_start.nil? ? @@force_start : planning.customer.optimization_force_start
           )
