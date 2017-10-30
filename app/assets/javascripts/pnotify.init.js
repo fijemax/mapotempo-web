@@ -79,15 +79,15 @@ var isWindowVisible = (function() {
     }
   }
 
-  function desktop_notify(status, message, options) {
-    PNotify.desktop.permission();
-    notify(status, message, $.extend({
-      title: reseller_name,
-      desktop: {
-        desktop: true
-      }
-    }, options));
-  }
+  // function desktop_notify(status, message, options) {
+  //   PNotify.desktop.permission();
+  //   notify(status, message, $.extend({
+  //     title: resellerName,
+  //     desktop: {
+  //       desktop: true
+  //     }
+  //   }, options));
+  // }
 
   $.extend(window, {
     notify: function(status, message, options) {
