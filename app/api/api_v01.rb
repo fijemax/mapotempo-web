@@ -56,13 +56,13 @@ class ApiV01 < Grape::API
 [Simplified view of domain model](' + Mapotempo::Application.config.swagger_docs_base_path + '/api/0.1/Model-simpel.svg).
 ## Model
 Model is structured around four majors concepts: the Customer account, Destinations, Vehicles and Plannings.
-* `Customers`: many of objects are linked to a customer account (relating to the user calling API).  
+* `Customers`: many of objects are linked to a customer account (relating to the user calling API).
 The customer has many users, each user has his own `api_key`.
 * `Destinations`: location points to visit with constraints. The same `Destination` can be visited several times : in this case several `Visit`s are associated to one `Destination`.
 * `Vehicles`: vehicles definition are splited in two parts:
  * the structural definition named `Vehicle` (car, truck, bike, consumption, etc.)
  * and the vehicle usage `VehicleUsage`, a specific usage of a physical vehicle in a specific context. Vehicles can be used in many contexts called `VehicleUsageSet` (set of all vehicles usages under a context). Multiple values are only available if dedicated option for customer is active. For instance, if customer needs to use its vehicle 2 times per day (morning and evening), he needs 2 `VehicleUsageSet` called "Morning" and "Evening" : each can have different values defined for stores, rest, etc... `VehicleUsageSet` defines default values for vehicle usage.
-* `Plannings`: `Planning` is a set of `Route`s to `Visit` `Destination`s with `Vehicle` within a `VehicleUsageSet` context.  
+* `Plannings`: `Planning` is a set of `Route`s to `Visit` `Destination`s with `Vehicle` within a `VehicleUsageSet` context.
 A route is a track between all destinations reached by a vehicle (a new route is created for each customer\'s vehicle and a route without vehicle is created for all out-of-route destinations). By default all customer\'s visites are used in a planning.
 
 ## Technical access
@@ -70,6 +70,7 @@ A route is a track between all destinations reached by a vehicle (a new route is
 This REST API is described with Swagger. The Swagger descriptor defines the request end-points, the parameters and the return values. The API can be addressed by HTTP request or with a generated client using the Swagger descriptor.
 ### API key
 All access to the API are subject to an `api_key` parameter in order to authenticate the user.
+This parameter can be sent with a query string on each available operation: `https://app.mapotempo.com/api/0.1/{objects}?api_key={your_personal_api_key}`
 ### Return
 The API supports several return formats: `json` and `xml` which depend of the requested extension used in url.
 ### I18n
@@ -97,8 +98,8 @@ Several default profiles are available and can be listed with an admin `api_key`
 `Zoning` is a concept which allows to define multiple `Zone`s (areas) around destinatons. A `Zone` can be affected to a `Vehicle` and if it is used into a `Planning`, all `Destinations` inside areas will be affected to the zone\'s vehicle (or `Route`). A polygon defining a `Zone` can be created outside the application or can be automatically generated from a planning.
 
 ## Code samples
-* Create and display destinations or visits.  
-Here some samples for these operations: [using PHP](' + Mapotempo::Application.config.swagger_docs_base_path + '/api/0.1/examples/php/example.php), [using Ruby](' + Mapotempo::Application.config.swagger_docs_base_path + '/api/0.1/examples/ruby/example.rb).  
+* Create and display destinations or visits.
+Here some samples for these operations: [using PHP](' + Mapotempo::Application.config.swagger_docs_base_path + '/api/0.1/examples/php/example.php), [using Ruby](' + Mapotempo::Application.config.swagger_docs_base_path + '/api/0.1/examples/ruby/example.rb).
 Note you can import destinations/visits and create a planning at the same time if you know beforehand the route for each destination/visit.
 * Same operations are available for stores (note you have an existing default store).
 * With created destinations/visits, you can create a planning (routes and stops are automatically created depending of yours vehicles and destinations/visits)
