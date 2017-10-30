@@ -38,6 +38,7 @@ class OptimizerWrapper
       stores = vehicles.flat_map{ |v| v[:stores] }
       rests = vehicles.flat_map{ |v| v[:rests] }
       shift_stores = 0
+      services_with_negative_quantities = []
 
       vrp = {
         units: vehicles.flat_map{ |v| v[:capacities] && v[:capacities].map{ |c| c[:deliverable_unit_id] } }.uniq.map{ |k|
@@ -96,6 +97,7 @@ class OptimizerWrapper
           v
         },
         services: services.each_with_index.collect{ |service, index|
+          services_with_negative_quantities.push("s#{service[:stop_id]}") if service[:quantities] && service[:quantities].values.any?{ |q| q && q < 0 }
           {
             id: "s#{service[:stop_id]}",
             type: 'service',
@@ -123,6 +125,11 @@ class OptimizerWrapper
             }.compact : []
           }.delete_if{ |k, v| !v }
         },
+        relations: [{
+          id: :never_first,
+          type: :never_first,
+          linked_ids: services_with_negative_quantities
+        }],
         configuration: {
           preprocessing: {
             cluster_threshold: options[:cluster_threshold],
