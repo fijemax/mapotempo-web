@@ -37,7 +37,7 @@ if ENV['BENCHMARK'] == 'true'
                                                     })
       file.original_filename = 'import_destinations_benchmark_900.csv'
 
-      time_ref = 5.minutes
+      time_ref = (5.minutes * BENCHMARK_CPU_RATE).round
       time_elapsed = Benchmark.realtime do
         import_csv = ImportCsv.new(importer: @importer, replace: false, file: file)
         assert import_csv.valid?
@@ -56,7 +56,7 @@ if ENV['BENCHMARK'] == 'true'
                                                     })
       file.original_filename = 'import_destinations_benchmark_900.json'
 
-      time_ref = 5.minutes
+      time_ref = (5.minutes * BENCHMARK_CPU_RATE).round
       time_elapsed = Benchmark.realtime do
         destinations = JSON.parse(file.read)
         import_json = ImportJson.new(importer: @importer, replace: false, json: destinations['destinations'])
@@ -77,7 +77,7 @@ if ENV['BENCHMARK'] == 'true'
                                                     })
       file.original_filename = 'import_destinations_benchmark_4000.csv'
 
-      time_ref = 12.minutes
+      time_ref = (12.minutes * BENCHMARK_CPU_RATE).round
       time_elapsed = Benchmark.realtime do
         import_csv = ImportCsv.new(importer: @importer, replace: false, file: file)
         assert import_csv.valid?
@@ -96,7 +96,7 @@ if ENV['BENCHMARK'] == 'true'
                                                     })
       file.original_filename = 'import_destinations_benchmark_4000.json'
 
-      time_ref = 5.minutes
+      time_ref = (5.minutes * BENCHMARK_CPU_RATE).round
       time_elapsed = Benchmark.realtime do
         destinations = JSON.parse(file.read)
         import_json = ImportJson.new(importer: @importer, replace: false, json: destinations['destinations'])
@@ -118,7 +118,7 @@ if ENV['BENCHMARK'] == 'true'
                                                       })
         file.original_filename = 'import_destinations_benchmark_28100.csv'
 
-        time_ref = 60.minutes
+        time_ref = (60.minutes * BENCHMARK_CPU_RATE).round
         time_elapsed = Benchmark.realtime do
           import_csv = ImportCsv.new(importer: @importer, replace: false, file: file)
           assert import_csv.valid?
@@ -139,7 +139,7 @@ if ENV['BENCHMARK'] == 'true'
                                                       })
         file.original_filename = 'import_destinations_benchmark_28100.json'
 
-        time_ref = 60.minutes
+        time_ref = (60.minutes * BENCHMARK_CPU_RATE).round
         time_elapsed = Benchmark.realtime do
           destinations = JSON.parse(file.read)
           import_json = ImportJson.new(importer: @importer, replace: false, json: destinations['destinations'])

@@ -125,6 +125,8 @@ end
 if ENV['BENCHMARK'] == 'true'
   require 'capybara/rails'
   require 'capybara/minitest'
+  require 'pi'
+  BENCHMARK_CPU_RATE = cpu_rate 17000
 
 # Browser testing configuration
   class ActionDispatch::IntegrationTest

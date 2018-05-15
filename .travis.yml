@@ -19,6 +19,7 @@ addons:
   apt:
     packages:
     - libgeos++-dev
+    - qt5-default libqt5webkit5-dev gstreamer1.0-plugins-base gstreamer1.0-tools gstreamer1.0-x
   postgresql: "9.4"
 
 
@@ -26,6 +27,7 @@ addons:
 before_install:
   - gem install bundler -v 1.17.3
   - bundle install --without development
+  - bundle exec rake assets:precompile
 
 before_script:
   - psql -c 'CREATE DATABASE mapotempo;' -U postgres
@@ -36,6 +38,7 @@ before_script:
 # Run
 script:
   - bundle exec rake test
+  # - travis_wait 30 bundle exec rake test COVERAGE=false BRAKEMAN=false BENCHMARK=true TEST=test/models/import_benchmark_test.rb
 
 notifications:
   slack: mapotempo:JU2Tat4AuZkNYkQEtOTbtWGP#git
