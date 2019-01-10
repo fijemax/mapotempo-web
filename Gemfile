@@ -6,7 +6,7 @@ gem 'rails', '~> 4.2'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5'
 # Use Uglifier as compressor for JavaScript assets
-gem 'uglifier'
+gem 'uglifier', '< 4.0' # TODO: fixme with use strict functions should be declared at top level
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails'
 
@@ -120,7 +120,7 @@ gem 'bootstrap-select-rails'
 gem 'sanitize'
 gem 'iconv'
 
-gem 'pg'
+gem 'pg', '< 1' # TODO: fix me for active record 4.2.11 compatibility
 
 gem 'sprockets'
 
