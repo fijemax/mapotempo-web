@@ -51,10 +51,11 @@ class V01::Tags < Grape::API
          nickname: 'getTag',
          success: V01::Entities::Tag
     params do
-      requires :id, type: Integer
+      requires :id, type: String, desc: ID_DESC
     end
     get ':id' do
-      present current_customer.tags.find(params[:id]), with: V01::Entities::Tag
+      id = ParseIdsRefs.read(params[:id])
+      present current_customer.tags.where(id).first!, with: V01::Entities::Tag
     end
 
     desc 'Create tag.',

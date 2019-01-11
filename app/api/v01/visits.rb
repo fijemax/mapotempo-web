@@ -30,8 +30,8 @@ class V01::Visits < Grape::API
       end
 
       # Deals with deprecated open and close
-      p[:open1] = p.delete(:open) unless p[:open1]
-      p[:close1] = p.delete(:close) unless p[:close1]
+      p[:open1] = p.delete(:open) if !p[:open1] && p.key?(:open)
+      p[:close1] = p.delete(:close) if !p[:close1] && p.key?(:close)
       # Deals with deprecated quantity
       unless p[:quantities]
         p[:quantities] = {current_customer.deliverable_units[0].id.to_s => p.delete(:quantity)} if p[:quantity] && current_customer.deliverable_units.size > 0

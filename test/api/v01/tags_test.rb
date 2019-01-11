@@ -37,6 +37,15 @@ class V01::TagsTest < ActiveSupport::TestCase
     assert_equal @tag.label, JSON.parse(last_response.body)['label']
   end
 
+  test 'should return a tag  by reference' do
+    get api(nil, 'ids' => "#{@tag.id},ref:#{tags(:tag_two).ref}")
+    assert last_response.ok?, last_response.body
+    body = JSON.parse(last_response.body)
+    assert_equal 2, body.size
+    assert_includes(body.map { |p| p['id'] }, @tag.id)
+    assert_includes(body.map { |p| p['ref'] }, tags(:tag_two).ref)
+  end
+
   test 'should create a tag' do
     assert_difference('Tag.count', 1) do
       @tag.label = 'new label'

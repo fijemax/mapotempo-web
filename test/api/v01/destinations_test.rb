@@ -57,6 +57,42 @@ class V01::DestinationsTest < ActiveSupport::TestCase
     end
   end
 
+  test 'should create with visits' do
+    assert_difference('Destination.count', 1) do
+      assert_difference('Stop.count', 0) do
+        assert_difference('Visit.count', 2) do
+          @destination.name = 'new dest'
+          post api(), @destination.attributes.update({tag_ids: tags}).merge(visits: [{
+            ref: 'v1',
+            quantity1_1: 1,
+            open1: '08:00',
+            close1: '12:00',
+            open2: '13:00',
+            close2: '14:00',
+            take_over: nil,
+            route: '1',
+            active: '1'
+          },
+          {
+            quantity1_1: 2,
+            ref: 'v2',
+            open1: '14:00',
+            close1: '18:00',
+            open2: '20:00',
+            close2: '21:00',
+            take_over: nil,
+            route: '1',
+            active: '1'
+          }])
+
+          assert last_response.created?, last_response.body
+          assert_equal @destination.name, JSON.parse(last_response.body)['name']
+          assert_equal "v1", JSON.parse(last_response.body)['visits'][0]['ref']
+        end
+      end
+    end
+  end
+
   test 'should create with geocode error' do
     Mapotempo::Application.config.geocoder.class.stub_any_instance(:code, lambda{ |*a| raise GeocodeError.new }) do
       assert_difference('Destination.count', 1) do
