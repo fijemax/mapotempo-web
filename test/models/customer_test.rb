@@ -347,7 +347,7 @@ class CustomerTest < ActiveSupport::TestCase
   test 'should duplicate without outdated routes' do
     duplicated_customer = nil
 
-    assert_difference('Customer.count',1) do
+    assert_difference('Customer.count', 1) do
       duplicated_customer = @customer.duplicate
       routes = duplicated_customer.plannings.map(&:routes).flatten
 
@@ -357,9 +357,40 @@ class CustomerTest < ActiveSupport::TestCase
     duplicated_customer.destroy!
   end
 
-  test 'should clear all destinations' do
-    @customer.delete_all_destinations
+  test 'should cascade delete destination, visits, stops' do
+    without_loading Stop do
+      without_loading Visit do
+        assert_difference('Stop.count', -6) do
+          assert_difference('Visit.count', -4) do
+            @customer.destinations.delete_all
+          end
+        end
+      end
+    end
+  end
 
+  test 'should clear all destinations and outdate routes' do
+    # TODO: activate code when without_loading can be called inside another without_loading with options
+    # without_loading Stop, if: -> (stop) { o = !stop.is_a?(StopRest); } do
+      without_loading Visit do
+        assert_difference('Stop.count', -6) do
+          assert_difference('Visit.count', -4) do
+            @customer.delete_all_destinations
+          end
+        end
+      end
+    # end
+    assert plannings(:planning_one).routes.all? { |r| r.outdated }
+  end
+
+  test 'should clear all visits and outdate routes' do
+    without_loading Stop, if: -> (stop) { !stop.is_a?(StopRest) } do
+      assert_difference('Stop.count', -6) do
+        assert_difference('Visit.count', -4) do
+          @customer.delete_all_visits
+        end
+      end
+    end
     assert plannings(:planning_one).routes.all? { |r| r.outdated }
   end
 
@@ -447,24 +478,8 @@ class CustomerTest < ActiveSupport::TestCase
   test 'should not load plans on enable multi-visits' do
     customer = customers(:customer_one)
 
-    begin
-      Planning.class_eval do
-        after_initialize :after_init_enable_multi_visits
-
-        def after_init_enable_multi_visits
-          raise 'Planning should not be loaded'
-        end
-      end
-
+    without_loading Planning do
       customer.update_attribute(:enable_multi_visits, !customer.enable_multi_visits)
-
-    rescue StandardError => e
-      puts e.message
-      assert_not e
-    ensure
-      Planning.class_eval do
-        def after_init_enable_multi_visits; end
-      end
     end
   end
 end

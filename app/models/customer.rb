@@ -241,7 +241,7 @@ class Customer < ApplicationRecord
   end
 
   def visits
-    destinations.collect(&:visits).flatten
+    destinations.flat_map(&:visits)
   end
 
   def delete_all_destinations
@@ -300,6 +300,7 @@ class Customer < ApplicationRecord
   end
 
   private
+
   def reindex_routes
     Route.includes_stops.scoping do
       plannings.reload.each { |p|

@@ -28,21 +28,10 @@ class ApiWeb::V01::PlanningsControllerTest < ActionController::TestCase
   end
 
   test 'should get edit' do
-    begin
-      Stop.class_eval do
-        after_initialize :after_init
-        def after_init
-          raise 'Stop should not be loaded'
-        end
-      end
+    without_loading Stop do
       get :edit, id: @planning
       assert_response :success
       assert_valid response
-    ensure
-      Stop.class_eval do
-        def after_init
-        end
-      end
     end
   end
 

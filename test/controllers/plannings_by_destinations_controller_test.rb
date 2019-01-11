@@ -23,25 +23,14 @@ class PlanningsByDestinationsControllerTest < ActionController::TestCase
   end
 
   test 'should show plannings by destination' do
-    begin
-      $stop_ids = @destination.visits.flat_map(&:stop_visits).map(&:id)
-      Stop.class_eval do
-        after_initialize :after_init
-        def after_init
-          raise 'Stop should not be loaded' unless $stop_ids.include? self.id
-        end
-      end
+    stop_ids = @destination.visits.flat_map(&:stop_visits).map(&:id)
+    without_loading Stop, if: -> (stop) { stop_ids.exclude? stop.id } do
       get :show, destination_id: @destination.id
       assert_response :success
       assert_valid response
       assert_equal 2, assigns(:stop_visits).size
       assert_equal 2, assigns(:routes_by_vehicles_by_planning).size
       assert_equal 3, assigns(:routes_by_vehicles_by_planning).flat_map{ |_k, v| v.keys }.uniq.size
-    ensure
-      Stop.class_eval do
-        def after_init
-        end
-      end
     end
   end
 end

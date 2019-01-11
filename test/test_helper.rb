@@ -75,6 +75,28 @@ class ActiveSupport::TestCase
 #    validation = html_validation.validation(response.body, response.to_s)
 #    assert validation.valid?, validation.exceptions
   end
+
+  def without_loading(klass, options = {})
+    begin
+      # TODO: find another way to transmit options
+      raise "without_loading cannot be used inside another without_loading block and different options" unless $_options.nil? || $_options == options
+      $_options = options
+      klass.class_eval do
+        after_initialize :after_init
+        def after_init
+          raise "#{self.class.name} should not be loaded" if $_options[:if].nil? || $_options[:if].call(self)
+        end
+      end
+
+      yield
+    ensure
+      klass.class_eval do
+        def after_init
+        end
+      end
+      $_options = nil
+    end
+  end
 end
 
 class ActionController::TestCase

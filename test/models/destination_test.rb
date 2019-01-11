@@ -129,26 +129,11 @@ class DestinationTest < ActiveSupport::TestCase
   end
 
   test 'should outdate route after tag changed on update' do
-    begin
-      route = routes(:route_zero_one)
-      $first_route_id = route.id
-      $second_route_id = routes(:route_zero_two).id
-      Stop.class_eval do
-        after_initialize :after_init
-        def after_init
-          if self.route_id != $first_route_id && self.route_id != $second_route_id
-            raise 'Stop should not be loaded'
-          end
-        end
-      end
-
+    route = routes(:route_zero_one)
+    without_loading Stop, if: -> (obj) { obj.route_id != route.id && obj.route_id != routes(:route_zero_two).id } do
       assert !route.outdated
       destinations(:destination_unaffected_one).update tags: [tags(:tag_one), tags(:tag_two)]
       assert route.reload.outdated
-    ensure
-      Stop.class_eval do
-        def after_init; end
-      end
     end
   end
 

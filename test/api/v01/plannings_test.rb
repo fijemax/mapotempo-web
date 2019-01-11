@@ -335,18 +335,10 @@ class V01::PlanningsTest < V01::PlanningsBaseTest
 
   test 'should update routes' do
     customers(:customer_one).update job_optimizer_id: nil
-    begin
-      Stop.class_eval do
-        after_initialize :after_init
+    planning = plannings :planning_one
+    route = routes :route_one_one
 
-        def after_init
-          raise 'Stop should not be loaded'
-        end
-      end
-
-      planning = plannings :planning_one
-      route = routes :route_one_one
-
+    without_loading Stop do
       patch api("#{planning.id}/update_routes"), { route_ids: [route.id], selection: 'none', action: 'toggle' }
       assert last_response.ok?
       assert_equal true, JSON.parse(last_response.body)[0]['hidden']
@@ -358,11 +350,6 @@ class V01::PlanningsTest < V01::PlanningsBaseTest
       assert_equal true, JSON.parse(last_response.body)[0]['locked']
       patch api("#{planning.id}/update_routes"), { route_ids: [route.id], selection: 'reverse', action: 'lock' }
       assert_equal false, JSON.parse(last_response.body)[0]['locked']
-    ensure
-      Stop.class_eval do
-        def after_init
-        end
-      end
     end
   end
 

@@ -400,16 +400,7 @@ class DestinationsControllerTest < ActionController::TestCase
   end
 
   test 'should update tag to move stop from plan to other' do
-    begin
-      $first_route_id = routes(:route_zero_one).id
-      $second_route_id = routes(:route_zero_two).id
-      Stop.class_eval do
-        after_initialize :after_init
-        def after_init
-          raise 'Stop should not be loaded' if self.route_id != $first_route_id && self.route_id != $second_route_id
-        end
-      end
-
+    without_loading Stop, if: -> (obj) { obj.route_id != routes(:route_zero_one).id && obj.route_id != routes(:route_zero_two).id } do
       patch :update, id: destinations(:destination_unaffected_one), destination: {
         tag_ids: [],
         visits_attributes: [{
@@ -417,10 +408,6 @@ class DestinationsControllerTest < ActionController::TestCase
         }]
       }
       assert_redirected_to edit_destination_path(assigns(:destination))
-    ensure
-      Stop.class_eval do
-        def after_init; end
-      end
     end
   end
 end

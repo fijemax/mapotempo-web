@@ -81,25 +81,12 @@ class PlanningTest < ActiveSupport::TestCase
     planning.compute
     Planning.import([planning], recursive: true, validate: false)
 
-    begin
-      Stop.class_eval do
-        after_initialize :after_init
-        def after_init
-          raise 'Stop should not be loaded'
-        end
-      end
-
+    without_loading Stop do
       t, z = planning.tags, planning.zonings
       planning.reload
       planning.tags, planning.zonings = t, z
       planning.routes.each { |route| route.complete_geojson }
       planning.save!
-
-    ensure
-      Stop.class_eval do
-        def after_init
-        end
-      end
     end
   end
 
