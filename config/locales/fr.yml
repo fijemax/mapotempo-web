@@ -178,6 +178,7 @@
         'speed_multiplier': 'Ajustement de la vitesse'
         'router': 'Calculateur d''itinéraire'
         'router_warning': 'Ce calculateur d''itinéraire n''est pas autorisé dans ce profil'
+        'layer_warning': 'Ce fond de carte n''est pas autorisé dans ce profil'
         'router_id': 'Calculateur d''itinéraire'
         'router_dimension': 'Objectif du calculateur'
         'router_options_traffic': 'Tenir compte du traffic'
@@ -776,6 +777,8 @@
   'customers':
     'duplicate':
       'success': 'Compte client dupliqué avec succès'
+    'import':
+      'success': 'Le compte client %{customer_name} a été importé avec succès.'
     'default':
       'country': 'France'
     'menu':
@@ -797,6 +800,7 @@
     'index':
       'title': 'Liste comptes client'
       'new': 'Nouveau compte client'
+      'import': 'Importer un compte client'
       'map': 'Carte'
       'no_test': 'hors test'
       'status': 'Statut'
@@ -806,6 +810,12 @@
       'created_end_subscription': 'Créé - Fin de souscription'
       'audience_url': 'Tableau de bord d''audience pour l''ensemble des comptes'
       'behavior_url': 'Tableau de bord comportemental pour l''ensemble des comptes'
+    'import':
+      'title': 'Importer un compte client'
+      'label': 'Sélectionner un compte client à partir d''un fichier .dump'
+      'submit': 'Importer le compte client'
+    'upload_dump':
+      'success': 'Client importé avec succès'
     'new':
       'title': 'Nouveau compte client'
     'destroy':

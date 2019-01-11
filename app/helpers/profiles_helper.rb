@@ -7,6 +7,14 @@ module ProfilesHelper
     h
   end
 
+  def layers_by_profile
+    h = {}
+    Profile.all.each do |profile|
+      h[profile.id] = profile.layers.pluck(:id)
+    end
+    h
+  end
+
   def routers_modes_by_profile
     routers_modes = routers_by_profile
     routers_modes.each do |profile, routers|

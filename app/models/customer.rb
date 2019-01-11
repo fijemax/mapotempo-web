@@ -58,6 +58,8 @@ class Customer < ApplicationRecord
   attribute :take_over, ScheduleType.new
   time_attr :take_over
 
+  attr_reader :layer_id # used for importation
+
   validates :profile, presence: true
   validates :router, presence: true
   validates :router_dimension, presence: true
@@ -84,15 +86,16 @@ class Customer < ApplicationRecord
   validates :optimization_time, numericality: true, allow_nil: true
   validate :validate_optimization_times
   validate :router_belong_to_profile, if: :new_record?
+  validates_inclusion_of :print_barcode, in: Customer::PRINT_BARCODE, allow_nil: true
 
   after_initialize :assign_defaults, :update_max_vehicles, if: :new_record?
   after_initialize :assign_device
-  after_create :create_default_store, :create_default_vehicle_usage_set, :create_default_deliverable_unit
-  before_update :update_max_vehicles, :update_enable_multi_visits, :update_outdated
+  before_validation :check_router_options_format
   before_save :sanitize_print_header, :nilify_router_options_blanks
   before_save :devices_update_vehicles, prepend: true
-  before_validation :check_router_options_format
-  validates_inclusion_of :print_barcode, in: Customer::PRINT_BARCODE, allow_nil: true
+  after_create :create_default_store, :create_default_vehicle_usage_set, :create_default_deliverable_unit
+
+  before_update :update_max_vehicles, :update_enable_multi_visits, :update_outdated
 
   include RefSanitizer
 

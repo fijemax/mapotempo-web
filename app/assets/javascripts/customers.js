@@ -210,19 +210,23 @@ var customers_edit = function(params) {
   routersAllowedForProfile(params);
   $('#customer_profile_id').on('click', function() {
     routersAllowedForProfile(params);
+    layersAllowedForProfile(params);
   });
   $('#customer_router').on('click', function() {
     removeRouterWarning();
   });
+  $('#customer_layer_id').on('click', function() {
+    removeLayerWarning();
+  });
 };
 
-function routersAllowedForProfile(params) {
+var routersAllowedForProfile = function(params) {
   var routersModesByProfile = JSON.parse(params.routers_modes_by_profile);
   var profileId = $('#customer_profile_id').val();
   if (profileId == '' || profileId === undefined) return;
   var routersModesAuthorized = routersModesByProfile[profileId];
   var routerOptions = $('#customer_router option');
-  var e = document.getElementById("customer_router");
+  var e = document.getElementById('customer_router');
   var selectedRouter = e.options[e.selectedIndex].value;
 
   for (var i = 0, optionsLength = routerOptions.length; i < optionsLength; i++) {
@@ -234,26 +238,65 @@ function routersAllowedForProfile(params) {
   } else {
     displayRouterWarning();
   }
-}
+};
 
-function hideOrDisplayRouterMode(routersModesAuthorized, optionEvaluated, key) {
+var hideOrDisplayRouterMode = function(routersModesAuthorized, optionEvaluated, key) {
   routersModesAuthorized = routersModesAuthorized || [];
   if (routersModesAuthorized.indexOf(optionEvaluated) !== -1) {
     $('#customer_router option').eq(key).removeClass('hidden');
   } else {
     $('#customer_router option').eq(key).addClass('hidden');
   }
-}
+};
 
-function removeRouterWarning() {
+var removeRouterWarning = function() {
   $("#customer_router_input").removeClass('has-warning');
   $(".router-unauthorized").addClass('hidden');
-}
+};
 
-function displayRouterWarning() {
+var displayRouterWarning = function() {
   $("#customer_router_input").addClass('has-warning');
   $(".router-unauthorized").removeClass('hidden');
-}
+};
+
+var layersAllowedForProfile = function(params) {
+  var layersByProfile = JSON.parse(params.layers_by_profile);
+  var profileId = $('#customer_profile_id').val();
+  if (profileId == '' || profileId === undefined) return;
+  var layersAuthorized = layersByProfile[profileId];
+  var layerOptions = $('#customer_layer_id option');
+  var e = document.getElementById('customer_layer_id');
+  var selectedLayer = e.options[e.selectedIndex].value;
+
+  for (var i = 0, optionsLength = layerOptions.length; i < optionsLength; i++) {
+    hideOrDisplayLayer(layersAuthorized, layerOptions[i].value, i);
+  }
+
+  if (layersAuthorized.indexOf(parseInt(selectedLayer)) !== -1) {
+    removeLayerWarning();
+  } else {
+    displayLayerWarning();
+  }
+};
+
+var hideOrDisplayLayer = function(layersAuthorized, optionEvaluated, key) {
+  layersAuthorized = layersAuthorized || [];
+  if (layersAuthorized.indexOf(parseInt(optionEvaluated)) !== -1) {
+    $('#customer_layer_id option').eq(key).removeClass('hidden');
+  } else {
+    $('#customer_layer_id option').eq(key).addClass('hidden');
+  }
+};
+
+var removeLayerWarning = function() {
+  $("#customer_layer_id_input").removeClass('has-warning');
+  $(".layer-unauthorized").addClass('hidden');
+};
+
+var displayLayerWarning = function() {
+  $("#customer_layer_id_input").addClass('has-warning');
+  $(".layer-unauthorized").removeClass('hidden');
+};
 
 var devicesObserveCustomer = (function() {
   'use strict';
@@ -500,6 +543,9 @@ Paloma.controller('Customers', {
     customers_edit(this.params);
   },
   update: function() {
+    customers_edit(this.params);
+  },
+  import: function() {
     customers_edit(this.params);
   }
 });

@@ -112,4 +112,12 @@ class CustomersControllerTest < ActionController::TestCase
       Mapotempo::Application.config.validate_during_duplication = orig_validate_during_duplication
     end
   end
+
+  test 'should dump customer for export' do
+    sign_in users(:user_admin)
+
+    get :export, id: @customer.id
+
+    assert_response :success
+  end
 end

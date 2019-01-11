@@ -85,6 +85,30 @@ class CustomersController < ApplicationController
     redirect_to [:customers], notice: t('.success')
   end
 
+  def export
+    export = ImportExportCustomer.export(@customer)
+    send_data export, :filename => "customer_#{@customer.name}_#{@customer.id}.dump"
+  end
+
+  def import
+    @customer = current_user.reseller.customers.build
+  end
+
+  def upload_dump
+    uploaded_io = customer_params[:uploaded_file]
+    file_path = Rails.root.join('public', 'uploads', uploaded_io.original_filename)
+    File.open(file_path, 'wb'){ |file| file.write(uploaded_io.read)}
+
+    string_customer = File.open(file_path, 'rb')
+    options = {profile_id: customer_params[:profile_id], router_id: customer_params[:router_id], layer_id: customer_params[:layer_id]}
+
+    File.delete(file_path)
+
+    customer = ImportExportCustomer.import(string_customer, options)
+
+    redirect_to [:customers], notice: t('.success', customer_name: customer.name)
+  end
+
   private
 
   def set_customer
@@ -148,6 +172,8 @@ class CustomersController < ApplicationController
         :router_id,
         :router_dimension,
         :speed_multiplier,
+        :layer_id,
+        :uploaded_file,
         router_options: [
           :time,
           :distance,

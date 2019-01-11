@@ -58,6 +58,21 @@
   }
 }
 
+#customer_uploaded_file_input{
+  margin : 0;
+  label{
+    display: none;
+  }
+}
+
+.file-label{
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 500px;
+  text-overflow: ellipsis;
+}
+
 [data-controller='customers'][data-action='index'] {
   .table-striped tr {
     background-color: transparent;
@@ -71,6 +86,12 @@
   .table-striped tr:nth-child(4n+0) td,
   .table-striped tr:nth-child(4n+2) td {
     border-top: none;
+  }
+}
+
+#customers{
+  .action-buttons{
+    width: 165px;
   }
 }
 

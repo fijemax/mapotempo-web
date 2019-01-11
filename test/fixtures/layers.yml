@@ -2,7 +2,7 @@
 
 layer_one:
   source: osm
-  name: MyString
+  name: layer one
   name_locale:
     fr: MaChaine
     en: MyString (en)
@@ -12,7 +12,7 @@ layer_one:
 
 layer_two:
   source: here
-  name: MyString
+  name: layer two
   name_locale:
     fr: MaChaine
     en: MyString (en)

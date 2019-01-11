@@ -18,9 +18,12 @@
 
 <div class="row row-top">
   <div class="col-md-2">
-    <%= link_to new_customer_path, class:"btn btn-primary btn-sm" do %><i class="fa fa-plus fa-fw"></i> <%= t '.new' %><% end %>
+    <%= link_to new_customer_path, class:"btn btn-primary" do %><i class="fa fa-plus fa-fw"></i> <%= t '.new' %><% end %>
   </div>
-  <div class="col-md-10">
+  <div class='col-md-2'>
+    <%= link_to import_customers_path, class:"btn btn-primary" do %><i class="fa fa-plus fa-fw"></i> <%= t '.import' %><% end %>
+  </div>
+  <div class="col-md-8">
     <div class="form-inline pull-right">
       <%= text_field_tag :customers_filter, nil, placeholder: t('all.verb.filter'), class: 'form-control' %>
       <span id="customers_count"><%= @customers.count %></span> <%= t 'activerecord.models.customers', count: @customers.count %> (<%= t '.no_test' %> : <span id="customers_notest_count"><%= @customers.select{ |customer| !customer.test }.count %></span>),
@@ -109,10 +112,13 @@
         </td>
         <td><%= customer.destinations.count %></td>
         <td><%= customer_plannings_count customer %></td>
-        <td rowspan="2" class="text-right">
+        <td rowspan="2" class="text-right action-buttons">
           <div class="btn-group" role="group" aria-label="Actions">
             <%= link_to [:duplicate, customer], method: :patch, class: "btn btn-default btn-sm", title: t('all.verb.duplicate'), data: { confirm: t('all.verb.destroy_confirm') } do %>
               <i class="fa fa-copy fa-fw"></i>
+            <% end %>
+            <%= link_to [:export, customer], method: :get, class: "btn btn-default btn-sm", title: t('all.verb.export.button'), data: { confirm: t('all.verb.destroy_confirm') } do %>
+              <i class="fa fa-download fa-fw"></i>
             <% end %>
             <%= link_to edit_customer_path(customer), class: "btn btn-primary btn-sm", title: t('all.verb.edit') do %>
               <i class="fa fa-edit fa-fw"></i>

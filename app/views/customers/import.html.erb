@@ -1,0 +1,39 @@
+<% content_for :title, t('.title') %>
+<h1><%= t '.title' %></h1>
+
+
+<div class="row row-top">
+
+  <%= twitter_bootstrap_form_for @customer, url: upload_dump_customers_path, layout: :horizontal, html: { class: 'form-horizontal', multipart: true } do |f| %>
+
+    <div class='form-group'>
+    <label class="col-md-2 control-label" for="uploaded-customer"><%= t('activerecord.models.customer') %></label>
+      <div class='col-md-6'>
+          <label class="btn btn-default form-control" id="upload-customer" for="uploaded-customer">
+            <%= f.file_field :uploaded_file, class: "hidden", id: 'uploaded-customer', onchange: "$('.file-label').html(this.files[0].name);$('.file-label').attr('title',this.files[0].name)" %>
+            <p class="file-label"><%= t('.label') %></p>
+          </label>
+      </div>
+    </div>
+
+    <%= render partial: 'profile_router_inputs', locals: { f: f } %>
+
+    <%= f.collection_select :layer_id, t('activerecord.models.layer'), Layer.all.sort_by(&:id).select{ |l| !l[:overlay] }, :id, :translated_name, {}, {required: true} %>
+    <div class="col-md-2"></div>
+    <p class="help-block layer-unauthorized hidden warning has-warning" style="display:block!important;"><%= t('activerecord.attributes.customer.layer_warning') %></p>
+
+    <span class="col-md-2"></span>
+    <%= f.submit t('.submit'), class: "btn btn-primary", disable_with: 'Importation...' %>
+  <% end %>
+
+</div>
+
+<%
+  routers = Router.all
+
+  controller.js(
+    routers_options: Hash[routers.collect { |r| [r.id, r.options] }],
+    routers_modes_by_profile: raw(routers_modes_by_profile.to_json),
+    layers_by_profile: raw(layers_by_profile.to_json)
+  )
+%>

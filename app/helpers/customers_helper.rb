@@ -25,7 +25,7 @@ module CustomersHelper
   end
 
   def has_vehicle_with_unauthorized_router(customer)
-    return false if customer.new_record? || customer.profile.blank?
+    return false if customer.new_record? || customer.profile.blank? || customer.vehicles.where.not(router_id: nil).empty?
     (customer.vehicles.pluck(:router_id) - customer.profile.routers.pluck(:id)).present?
   end
 

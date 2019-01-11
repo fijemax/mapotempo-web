@@ -178,6 +178,7 @@ en:
         speed_multiplier: Speed multiplier
         router: Routing Engine
         router_warning: This routing engine is unauthorized in this profile
+        layer_warning: This layer is unauthorized in this profile
         router_id: Routing Engine
         router_dimension: Router objective
         router_options_traffic: Take into account traffic
@@ -751,6 +752,8 @@ en:
   customers:
     duplicate:
       success: Customer account duplicated successfully
+    import:
+      success: Customer account %{customer_name} imported successfully
     default:
       country: England
     menu:
@@ -772,6 +775,8 @@ en:
     index:
       title: Listing accounts
       new: New Account
+      import: Import customer
+      import: Import
       map: Map
       no_test: not in test
       status: Status
@@ -781,6 +786,12 @@ en:
       created_end_subscription: Created - End subscription
       audience_url: Audience Dashboard for all accounts
       behavior_url: Behavior Dashboard for all accounts
+    import:
+      title: Import customer
+      label: Select customer from .dump file
+      submit: Import customer
+    upload_dump:
+      success: Customer successfully imported
     new:
       title: New Account
     destroy:

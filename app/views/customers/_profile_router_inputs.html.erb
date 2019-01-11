@@ -1,0 +1,27 @@
+<% if current_user.admin? %>
+  <%= f.collection_select :profile_id, [], Profile.all, :id, :name, {}, {required: true, input_group: content_tag('i', '', class: 'fa fa-gear fa-fw')} %>
+
+  <% if has_vehicle_with_unauthorized_router(@customer) %>
+    <p class="vehicle-router-unauthorized warning has-warning"><%= t('customers.form.vehicle_router_unauthorized', profile: @customer.profile.name).html_safe %></p>
+  <% end %>
+  <% if has_user_with_unauthorized_layer(@customer) %>
+    <p class="user-layer-unauthorized warning has-warning"><%= t('customers.form.user_layer_unauthorized', profile: @customer.profile.name).html_safe %></p>
+  <% end %>
+<% end %>
+
+<div id="customer_router_input" class="form-group">
+  <label class="col-md-2 control-label" for="customer_router"><%= t('activerecord.attributes.customer.router') %></label>
+  <div class="col-md-6">
+    <div class="input-group">
+      <%= select_tag 'customer[router]', grouped_options_for_select([[t('activerecord.attributes.router.router_dimensions.time'), Router.all.select(&:time?).collect{ |router|
+          [router.translated_name + ' - ' + t('activerecord.attributes.router.router_dimensions.time'), router.id.to_s + '_time']
+          }]] + [[t('activerecord.attributes.router.router_dimensions.distance'), Router.all.select(&:distance?).collect{ |router|
+          [router.translated_name + ' - ' + t('activerecord.attributes.router.router_dimensions.distance'), router.id.to_s + '_distance']
+          }]],
+        @customer.router_id.to_s + '_' + @customer.router_dimension), class: 'form-control', required: true %>
+      <span class="input-group-addon"><i class="fa fa-gear fa-fw"></i></span>
+    </div>
+    <p class="help-block"><%= t('customers.form.router_help') %></p>
+    <p class="help-block router-unauthorized hidden warning has-warning"><%= t('activerecord.attributes.customer.router_warning') %></p>
+  </div>
+</div>

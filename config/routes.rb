@@ -68,11 +68,14 @@ Rails.application.routes.draw do
 
   resources :customers do
     collection do
+      get :import
+      post :upload_dump
       delete :destroy_multiple
     end
     member do
       delete :delete_vehicle
       patch :duplicate
+      get :export
     end
   end
 
