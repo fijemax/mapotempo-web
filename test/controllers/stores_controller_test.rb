@@ -85,9 +85,21 @@ class StoresControllerTest < ActionController::TestCase
   end
 
   test 'should destroy store' do
+    vehicle_usage_sets = VehicleUsageSet.where("store_rest_id = #{@store.id} OR store_start_id = #{@store.id} OR store_stop_id = #{@store.id}")
+    vehicle_usages = VehicleUsage.where("store_rest_id = #{@store.id} OR store_start_id = #{@store.id} OR store_stop_id = #{@store.id}")
+
+    vehicle_usages.each { |v| assert v.store_start == @store || v.store_stop == @store || v.store_rest == @store }
+    vehicle_usage_sets.each { |v| assert v.store_start == @store || v.store_stop == @store || v.store_rest == @store }
+
     assert_difference('Store.count', -1) do
       delete :destroy, id: @store
     end
+
+    vehicle_usages.reload
+    vehicle_usage_sets.reload
+
+    vehicle_usages.each { |v| assert v.store_start != @store && v.store_stop != @store && v.store_rest != @store }
+    vehicle_usage_sets .each { |v| assert v.store_start != @store && v.store_stop != @store && v.store_rest != @store }
 
     assert_redirected_to stores_path
   end

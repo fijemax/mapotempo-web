@@ -95,13 +95,18 @@ class Store < Location
   def destroy_vehicle_store
     default = customer.stores.find{ |store| store != self && !store.destroyed? }
     if default
-      vehicle_usage_set_starts.each{ |vehicle_usage_set|
-        vehicle_usage_set.store_start = default
+      (vehicle_usage_set_starts + vehicle_usage_set_stops + vehicle_usage_set_rests).uniq.each{ |vehicle_usage_set|
+        vehicle_usage_set.store_start = default if vehicle_usage_set.store_start == self
+        vehicle_usage_set.store_stop = default if vehicle_usage_set.store_stop == self
+        vehicle_usage_set.store_rest = default if vehicle_usage_set.store_rest == self
         vehicle_usage_set.save!
       }
-      vehicle_usage_set_stops.each{ |vehicle_usage_set|
-        vehicle_usage_set.store_stop = default
-        vehicle_usage_set.save!
+
+      (vehicle_usage_starts + vehicle_usage_stops + vehicle_usage_rests).uniq.each{ |vehicle_usage|
+        vehicle_usage.store_start = default if vehicle_usage.store_start == self
+        vehicle_usage.store_stop = default if vehicle_usage.store_stop == self
+        vehicle_usage.store_rest = default if vehicle_usage.store_rest == self
+        vehicle_usage.save!
       }
       true
     else
