@@ -1257,9 +1257,13 @@ var geocodeComplete = function(field, api) {
   });
 
   var autocompleteRequest = function (req, dataContainer) {
+    var country = $(':input[name$=\\[country\\]]').val();
     var formData = {
       street: req.term,
-      country: 'France'
+      country: country !== '' ? country : $(':input[name$=\\[country\\]]')
+        .attr('placeholder')
+        .replace(/ \(.+\)/g, '')
+        .trim()
     }
 
     $.ajax({
