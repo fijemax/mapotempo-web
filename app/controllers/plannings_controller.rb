@@ -411,26 +411,16 @@ class PlanningsController < ApplicationController
   end
 
   def includes_sub_models
-    VehicleUsage.with_stores.scoping do
-      if @with_stops
-        if (params[:route_id] || params[:route_ids]) && %i[move switch].exclude?(action_name.to_sym)
-          Route.where(id: [params[:route_id]] + (params[:route_ids] ? params[:route_ids].split(',') : [])).includes_destinations.scoping do
-            yield
-          end
-        elsif %i[automatic_insert move optimize switch].include?(action_name.to_sym)
-          Stop.includes_destinations.scoping do
-            yield
-          end
-        elsif %i[show edit].exclude?(action_name.to_sym) || !request.format.html?
-          Route.includes_destinations.scoping do
-            yield
-          end
-        else
-          yield
-        end
-      else
+    if @with_stops && (params[:route_id] || params[:route_ids] || [:automatic_insert, :optimize].include?(action_name.to_sym))
+      Stop.includes_destinations.scoping do
         yield
       end
+    elsif @with_stops && ([:show, :edit].exclude?(action_name.to_sym) || !request.format.html?)
+      Route.includes_destinations.scoping do
+        yield
+      end
+    else
+      yield
     end
   end
 

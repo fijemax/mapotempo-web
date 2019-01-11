@@ -509,6 +509,7 @@ class PlanningsControllerTest < ActionController::TestCase
       get :optimize_route, planning_id: @planning, format: :json, route_id: routes(:route_one_one).id
       assert_response :success
       assert_equal 1, JSON.parse(response.body)['routes'].size
+      assert_equal 2, JSON.parse(response.body)['averages']['vehicles']
     end
   end
 
