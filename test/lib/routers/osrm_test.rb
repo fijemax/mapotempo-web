@@ -14,8 +14,9 @@ class Routers::OsrmTest < ActionController::TestCase
 
       stubs_table = points.collect{ |point|
         # Workaround webmock + addressable using hash no working with duplicate params
-        uri_template = Addressable::Template.new('localhost:5000/0.1/table?loc=' + point.join(','))
-        stub_table = stub_request(:get, uri_template).to_return(File.new(File.expand_path('../../../web_mocks/', __FILE__) + '/osrm/table-1.json').read)
+        uri_template = Addressable::Template.new('http://localhost:5000/0.1/table?loc=' + point.join(','))
+        stub_table = stub_request(:get, uri_template)
+          .to_return(status: 200, body: File.new(File.expand_path('../../../web_mocks/', __FILE__) + '/osrm/table-1.json').read, headers: {})
       }
 
       matrix = @osrm.matrix(routers(:router_one).url_time, points)
@@ -32,11 +33,11 @@ class Routers::OsrmTest < ActionController::TestCase
 
       stubs = points.collect{ |point|
         # Workaround webmock + addressable using hash no working with duplicate params
-        uri_template = Addressable::Template.new('localhost:5000/0.1/viaroute?alt=false&loc=' + point.join(',') + '&output=json')
-        stub_viaroute = stub_request(:get, uri_template).to_return(File.new(File.expand_path('../../../web_mocks/', __FILE__) + '/osrm/viaroute-impassable.json').read)
+        uri_template = Addressable::Template.new('http://localhost:5000/0.1/viaroute?alt=false&loc=' + point.join(',') + '&output=json')
+        stub_viaroute = stub_request(:get, uri_template).to_return(status: 200, body: File.new(File.expand_path('../../../web_mocks/', __FILE__) + '/osrm/viaroute-impassable.json').read)
 
-        uri_template = Addressable::Template.new('localhost:5000/0.1/table?loc=' + point.join(','))
-        stub_table = stub_request(:get, uri_template).to_return(File.new(File.expand_path('../../../web_mocks/', __FILE__) + '/osrm/table-impassable.json').read)
+        uri_template = Addressable::Template.new('http://localhost:5000/0.1/table?loc=' + point.join(','))
+        stub_table = stub_request(:get, uri_template).to_return(status: 200, body: File.new(File.expand_path('../../../web_mocks/', __FILE__) + '/osrm/table-impassable.json').read)
 
         [stub_viaroute, stub_table]
       }

@@ -76,9 +76,9 @@ class ZoningTest < ActiveSupport::TestCase
     begin
         # TODO: An undefined test changes time zone...
         # .with(:body => hash_including(size: '5', mode: 'car', traffic: 'true', weight: '10', departure: Date.today.strftime('%Y-%m-%d') + ' 10:00:00 UTC'))
-      stub_isochrone = stub_request(:post, 'localhost:5000/0.1/isoline.json')
+      stub_isochrone = stub_request(:post, 'http://localhost:5000/0.1/isoline.json')
         .with(:body => hash_including(size: '5', mode: 'car', traffic: 'true', weight: '10', departure: Date.today.strftime('%Y-%m-%d') + ' 10:00:00 ' + (Time.zone.now.strftime('%z') == '+0000' ? 'UTC' : (Time.zone.now.strftime('%z')))))
-        .to_return(File.new(File.expand_path('../../web_mocks/', __FILE__) + '/isochrone/isochrone-1.json').read)
+        .to_return(status: 200, body: File.new(File.expand_path('../../web_mocks/', __FILE__) + '/isochrone/isochrone-1.json').read)
       zoning = zonings(:zoning_one)
       zoning.isochrones(5, zoning.customer.vehicle_usage_sets[0], Date.today)
       assert_equal zoning.customer.vehicle_usage_sets[0].vehicle_usages.select(&:active).count, zoning.zones.length

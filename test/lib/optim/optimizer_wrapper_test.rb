@@ -6,11 +6,11 @@ class OptimizerWrapperTest < ActionController::TestCase
   setup do
     @optim = OptimizerWrapper.new(ActiveSupport::Cache::NullStore.new, 'http://localhost:1791/0.1', 'demo')
 
-    uri_template = Addressable::Template.new('localhost:1791/0.1/vrp/submit.json')
-    @stub_VrpSubmit = stub_request(:post, uri_template).to_return(File.new(File.expand_path('../../../', __FILE__) + '/fixtures/optimizer-wrapper/vrp-submit.json').read)
+    uri_template = Addressable::Template.new('http://localhost:1791/0.1/vrp/submit.json')
+    @stub_VrpSubmit = stub_request(:post, uri_template).to_return(status: 200, body: File.new(File.expand_path('../../../', __FILE__) + '/fixtures/optimizer-wrapper/vrp-submit.json').read)
 
     uri_template = Addressable::Template.new('http://localhost:1791/0.1/vrp/jobs/{job_id}.json?api_key={api_key}')
-    @stub_VrpJob = stub_request(:get, uri_template).to_return(File.new(File.expand_path('../../../', __FILE__) + '/fixtures/optimizer-wrapper/vrp-job.json').read)
+    @stub_VrpJob = stub_request(:get, uri_template).to_return(status: 200, body: File.new(File.expand_path('../../../', __FILE__) + '/fixtures/optimizer-wrapper/vrp-job.json').read)
   end
 
   def teardown

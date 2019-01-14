@@ -1,3 +1,1 @@
-HTTP/1.1 200 OK
-
 {"status_message":"Cannot find route between points","status":207}
