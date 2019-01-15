@@ -476,10 +476,19 @@ class CustomerTest < ActiveSupport::TestCase
   end
 
   test 'should not load plans on enable multi-visits' do
-    customer = customers(:customer_one)
-
     without_loading Planning do
-      customer.update_attribute(:enable_multi_visits, !customer.enable_multi_visits)
+      without_loading Route do
+        @customer.update_attribute(:enable_multi_visits, !@customer.enable_multi_visits)
+      end
+    end
+  end
+
+  test 'should not load routes when updating plans' do
+    without_loading Route do
+      @customer.plannings.each_with_index do |p, i|
+        p.zoning_outdated = true if i == 0
+      end
+      @customer.save!
     end
   end
 end

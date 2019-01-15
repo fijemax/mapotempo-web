@@ -41,11 +41,9 @@ class GeocoderDestinationsJob < Job.new(:customer_id, :planning_ids)
 
     Destination.transaction do
       unless !planning_ids || planning_ids.empty?
-        customer.plannings.each{ |planning|
-          if planning_ids.include? planning.id
-            planning.compute
-            planning.save!
-          end
+        customer.plannings.find(planning_ids).each{ |planning|
+          planning.compute
+          planning.save!
         }
       end
     end
