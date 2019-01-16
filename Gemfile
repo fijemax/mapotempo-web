@@ -88,9 +88,9 @@ group :test do
   gem 'chromedriver-helper'
 end
 
-gem 'grape', '< 0.19.2' # FIXME wait for ruby 2.2.6
+gem 'grape'
 gem 'grape-entity'
-gem 'grape-swagger', '< 0.26' # FIXME wait for ruby 2.2.6
+gem 'grape-swagger'
 gem 'grape-swagger-entity'
 gem 'rack-cors'
 gem 'swagger-docs'
@@ -194,7 +194,7 @@ gem 'nexmo'
 group :production do
   gem 'rails_12factor'
 
-  gem 'redis', '< 4' # Waiting Ruby 2.2 (dependency from resque)
+  gem 'redis'
   gem 'redis-store', '~> 1.4.1' # Ensure redis-store dependency is at least 1.4.1 for CVE-2017-1000248 correction
   gem 'redis-rails'
 end
