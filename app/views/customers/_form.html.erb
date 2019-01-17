@@ -374,10 +374,10 @@
       <%= f.number_field :optimization_stop_soft_upper_bound, { placeholder: t('.optimization_soft_upper_bound_default', n: LocalizedValues.localize_numeric_value(Mapotempo::Application.config.optimize_stop_soft_upper_bound)), min: 0, step: 'any', input_group: '×'} do %>
         <p class="help-block"><%= t '.optimization_stop_soft_upper_bound_help' %></p>
       <% end %>
-      <%= f.number_field :optimization_vehicle_soft_upper_bound, { placeholder: t('.optimization_soft_upper_bound_default', n: LocalizedValues.localize_numeric_value(Mapotempo::Application.config.optimize_vehicle_soft_upper_bound)), min: 0, step: 'any', input_group: 'Ã—'} do %>
+      <%= f.number_field :optimization_vehicle_soft_upper_bound, { placeholder: t('.optimization_soft_upper_bound_default', n: LocalizedValues.localize_numeric_value(Mapotempo::Application.config.optimize_vehicle_soft_upper_bound)), min: 0, step: 'any', input_group: '×'} do %>
         <p class="help-block"><%= t '.optimization_vehicle_soft_upper_bound_help' %></p>
       <% end %>
-      <%= f.number_field :optimization_cost_waiting_time, { placeholder: t('.optimization_cost_waiting_time_default', n: LocalizedValues.localize_numeric_value(Mapotempo::Application.config.optimize_cost_waiting_time)), min: 0, step: 'any', input_group: 'Ã—'} do %>
+      <%= f.number_field :optimization_cost_waiting_time, { placeholder: t('.optimization_cost_waiting_time_default', n: LocalizedValues.localize_numeric_value(Mapotempo::Application.config.optimize_cost_waiting_time)), min: 0, step: 'any', input_group: '×'} do %>
           <p class="help-block"><%= t '.optimization_cost_waiting_time_help' %></p>
       <% end %>
       <%= f.toggles t 'activerecord.attributes.customer.optimization_force_start' do %>
