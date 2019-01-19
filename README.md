@@ -17,111 +17,146 @@ Route optimization with numerous stops. Based on [OpenStreetMap](http://www.open
 
 ### Project dependencies
 
-#### On Fedora
+#### On Ubuntu
 
-Install ruby (>2.0 is needed), bundler and some dependencies from system package.
+Install Ruby (> 2.2 is needed) and other dependencies from system package.
 
-    yum install ruby ruby-devel rubygem-bundler postgresql-devel libgeos++-dev
-
-#### On Mac OS
-
-Install ruby (>2.0 is needed), bundler and some dependencies from system package.
-
-    brew install icu4c
-    bundle config build.charlock_holmes --with-icu-dir=/usr/local/opt/icu4c
-
-#### On other systems
-
-Install Ruby (> 2.0 is needed) and other dependencies from system package.
-
-For exemple, with __Ubuntu__, follows this instructions :
+For exemple, with __Ubuntu__, follows this instructions:
 
 To know the last version, check with this command tools
 
     apt-cache search [package_name]
 
-First, install Ruby :
+First, install Ruby:
 
-    sudo apt install ruby2.1.8 ruby2.1.8-dev
+    sudo apt install ruby2.3.7 ruby2.3.7-dev
 
-Next, install Postgrsql environement :
+Next, install Postgresql environement:
 
-     postgresql postgresql-client-9.6 postgresql-server-dev-9.6
+    sudo apt install postgresql postgresql-client-9.6 postgresql-server-dev-9.6
 
-You need some others libs :
+You need some others libs:
 
-    libz-dev libicu-dev build-essential g++ libgeos-dev libgeos++-dev
+    sudo apt install libz-dev libicu-dev build-essential g++ libgeos-dev libgeos++-dev
 
 __It's important to have all of this installed packages before installing following gems.__
+
+#### On Fedora
+
+Install ruby (>2.2 is needed), bundler and some dependencies from system package.
+
+    yum install ruby ruby-devel rubygem-bundler postgresql-devel libgeos++-dev
+
+#### On Mac OS
+
+Install ruby (>2.2 is needed), bundler and some dependencies from system package.
+
+    brew install postgresql icu4c geos
 
 ### Install Bundler Gem
 
 Bundler provides a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed.
 For more informations see [Bundler website](http://bundler.io).
 
-To install Bundler Ruby Gem:
-
-    export GEM_HOME=~/.gem/ruby/2.1.8
-    gem install bundler
-
-The GEM_HOME variable is the place who are stored Ruby gems.
-
-## Requirements for all systems
-
-Now add gem bin directory to path with :
-
-    export PATH=$PATH:~/.gem/ruby/2.1.8/bin
-
-Add Environement Variables into the end of your .bashrc file :
+You can use rbenv or rvm before installing Bundler.
+In other cases, you have to define some variables. Add Environement Variables into the end of your `~/.bashrc` file:
 
     nano ~/.bashrc
 
-Add following code :
+Add following code:
 
     # RUBY GEM CONFIG
-    export GEM_HOME=~/.gem/ruby/2.1.8
-    export PATH=$PATH:~/.gem/ruby/2.1.8/bin
+    export GEM_HOME=~/.gem/ruby/2.3.7
+    export PATH=$PATH:~/.gem/ruby/2.3.7/bin
+
+The GEM_HOME variable is the place who are stored Ruby gems.
 
 Save changes and Quit
 
-Run this command to activate your modifications :
+Run this command to activate your modifications:
 
     source ~/.bashrc
+
+After setting ruby and gem env, install Bundler Ruby Gem:
+
+    gem install bundler
 
 ### Install project
 
 For the following installation, your current working directory needs to be the mapotempo-web root directory.
 
-Clone the project :
+Clone the project:
 
     git clone git@github.com:Mapotempo/mapotempo-web.git
 
-Go to project directory :
+Go to project directory:
 
     cd mapotempo-web
 
-Add the ruby version :
+Add the ruby version:
 
-    echo '2.1.8' >> .ruby-version
+    echo '2.3.7' >> .ruby-version
 
-And finally install gem project dependencies with :
+On Mac OS only you may need:
+
+    bundle config build.charlock_holmes --with-icu-dir=/usr/local/opt/icu4c
+
+And finally install gem project dependencies with:
 
     bundle install
 
-I you have this message :
+If you have this message:
 >Important: You may need to add a javascript runtime to your Gemfile in order for bootstrap's LESS files to compile to CSS.
 
 Don't worry, we use SASS to compile CSS and not LESS.
 
 ## Configuration
 
+### Background Tasks
+Delayed job (background task) can be activated by setting `Mapotempo::Application.config.delayed_job_use = true` it's allow asynchronous running of import geocoder and optimization computation.
+
+## Initialization
+
+Check database configuration in `config/database.yml` and from project directory create a database for your environment with:
+
+As postgres user:
+
+    sudo -i -u postgres
+
+Create user and databases:
+
+    createuser -s [username]
+    createdb -E UTF8 -T template0 -O [username] mapotempo-dev
+    createdb -E UTF8 -T template0 -O [username] mapotempo-test
+
+Create a `config/application.yml` file and set variables:
+
+```
+PG_USERNAME: "[username]"
+PG_PASSWORD: "[userpassword]"
+```
+
+If postgres username is the system user, you can keep blank password. By default, the *user*/*password* variables are set to *mapotempo*/*mapotempo*
+
+For informations, to __delete a user__ use:
+
+    dropuser [username]
+
+Or to __delete a database__:
+
+    dropdb [database]
+
+As normal user, we call rake to initialize databases (load schema and demo data):
+
+    rake db:setup
+
 ### Override variables
-Default project configuration is in `config/application.rb` you can override any setting by create a `config/initializers/mapotempo.rb` file and override any variable.
+Default project configuration is in `config/application.rb` you can override any setting by create a `config/initializers/your_config.rb` file and override any variable.
 
 External resources can be configured trough environment variables:
-* POSTGRES_USERNAME, default: 'mapotempo'
-* POSTGRES_PASSWORD, default: 'mapotempo'
-* POSTGRES_DATABASE', default: 'mapotempo-test', 'mapotempo-dev' or 'mapotempo-prod'
+* PG_USERNAME, default: 'mapotempo'
+* PG_PASSWORD, default: 'mapotempo'
+* PG_DATABASE', default: 'mapotempo-test', 'mapotempo-dev' or 'mapotempo-prod'
 * REDIS_HOST', default: 'localhost', production environment only
 * OPTIMIZER_URL, default: 'http://localhost:1791/0.1'
 * OPTIMIZER_API_KEY, default: 'demo'
@@ -134,46 +169,6 @@ External resources can be configured trough environment variables:
 * DEVICE_TOMTOM_API_KEY
 * DEVICE_FLEET_ADMIN_API_KEY
 
-### Background Tasks
-Delayed job (background task) can be activated by setting `Mapotempo::Application.config.delayed_job_use = true` it's allow asynchronous running of import geocoder and optimization computation.
-
-Default configuration point on public [OSRM](http://project-osrm.org) API but matrix computation heavily discouraged on it. So point on your own instance.
-
-## Initialization
-
-Check database configuration in `config/database.yml` and from project directory create a database for your environment with :
-
-As postgres user:
-
-    sudo -i -u postgres
-
-Create user and databases:
-
-    createuser -s [username]
-    createdb -E UTF8 -T template0 -O [username] mapotempo-dev
-    createdb -E UTF8 -T template0 -O [username] mapotempo-test
-
-Create a `config/application.yml` file and set variables :
-
-```
-PG_USERNAME: "[username]"
-PG_PASSWORD: "[userpassword]"
-```
-
-By default, the *user*/*password* variables are set to *mapotempo*/*mapotempo*
-
-For informations, to __delete a user__ use :
-
-    dropuser [username]
-
-To __delete a database__ :
-
-    dropdb [database]
-
-As normal user, we call rake to initialize databases (load schema and demo data) :
-
-    rake db:setup
-
 ## Running
 
 Start standalone rails server with
@@ -185,6 +180,10 @@ Enjoy at [http://localhost:3000](http://localhost:3000)
 Start the background jobs runner with
 
     ./bin/delayed_job run
+
+Or set the use of delayed job to false in your app config:
+
+    Mapotempo::Application.config.delayed_job_use = false
 
 ## Running on production
 
