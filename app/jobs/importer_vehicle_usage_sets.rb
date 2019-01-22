@@ -127,7 +127,7 @@ class ImporterVehicleUsageSets < ImporterBase
   def prepare_tags(row, key)
     if !row[key].nil?
       if row[key].is_a?(String)
-        row[key] = row[key].split(',').select{ |k|
+        row[key] = row[key].split(',').uniq.select{ |k|
           !k.empty?
         }
       end

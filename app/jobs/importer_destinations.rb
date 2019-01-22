@@ -207,7 +207,7 @@ class ImporterDestinations < ImporterBase
   def prepare_tags(row, key)
     if !row[key].nil?
       if row[key].is_a?(String)
-        row[key] = row[key].split(',').select{ |key|
+        row[key] = row[key].split(',').uniq.select{ |key|
           !key.empty?
         }
       end

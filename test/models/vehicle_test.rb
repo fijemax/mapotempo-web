@@ -189,4 +189,13 @@ class VehicleTest < ActiveSupport::TestCase
     assert_not vehicle_usage.update(tags: [tags(:tag_three)])
     assert_equal vehicle_usage.reload.tags.size, 0
   end
+
+  test 'should not have twice tags with same label' do
+    vehicle_usage = vehicle_usages(:vehicle_usage_one_one)
+    new_tag = Tag.new({label: tags(:tag_one).label, customer_id: customers(:customer_one).id})
+
+    assert_raises 'ActiveRecord::RecordInvalid' do
+      vehicle_usage.update(tags: [tags(:tag_one), new_tag])
+    end
+  end
 end

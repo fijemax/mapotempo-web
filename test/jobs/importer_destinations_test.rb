@@ -57,6 +57,13 @@ class ImporterDestinationsTest < ActionController::TestCase
     end
   end
 
+  test 'should import only once tag if twice have the same label' do
+    assert_difference('Tag.count', 2) do
+      assert ImportCsv.new(importer: ImporterDestinations.new(@customer), replace: true, file: tempfile('test/fixtures/files/import_destinations_with_duplicated_tag.csv', 'text.csv')).import
+      assert_equal 1, @customer.destinations.size
+    end
+  end
+
   test 'should import only ref in new planning' do
     # clean all visit ref to update the first destination's visit without ref during import
     Visit.all.each{ |v| v.update! ref: nil }

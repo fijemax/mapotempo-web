@@ -30,6 +30,7 @@ class Tag < ApplicationRecord
 
   validates :label, presence: true
   validates :ref, uniqueness: { scope: :customer_id, case_sensitive: true }, allow_nil: true, allow_blank: true
+  validates :label, uniqueness: { scope: :customer_id, case_sensitive: true }, allow_nil: true, allow_blank: true
   validates_format_of :color, with: /\A(|\#[A-Fa-f0-9]{6})\Z/, allow_nil: true
 
   validates_inclusion_of :icon, in: FontAwesome::ICONS_TABLE, allow_nil: true, message: ->(*_) { I18n.t('activerecord.errors.models.tag.icon_unknown') }
