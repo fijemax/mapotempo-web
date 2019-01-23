@@ -83,7 +83,7 @@ class Fleet < DeviceBase
   def check_auth(params)
     rest_client_get(get_user_url(params[:user]), params[:api_key])
   rescue RestClient::Forbidden, RestClient::InternalServerError, RestClient::ResourceNotFound, RestClient::Unauthorized, Errno::ECONNREFUSED
-    raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.invalid_account')}")
+    raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.invalid_account')}")
   end
 
   def list_devices(customer, _params = {})
@@ -99,15 +99,15 @@ class Fleet < DeviceBase
         }
       end
     else
-      raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.list')}")
+      raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.list')}")
     end
   rescue RestClient::Unauthorized, RestClient::InternalServerError
-    raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.list')}")
+    raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.list')}")
   end
 
   def create_company(customer)
     admin_api_key = Mapotempo::Application.config.devices.fleet.admin_api_key
-    raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.create_company.no_admin_api_key')}") unless admin_api_key
+    raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.create_company.no_admin_api_key')}") unless admin_api_key
 
     begin
       # Create company with admin user
@@ -136,18 +136,18 @@ class Fleet < DeviceBase
     rescue RestClient::UnprocessableEntity => e
       error = JSON.parse(e.response)
       if error['name'] && error['name'][0] == 'has already been taken'
-        raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.create_company.already_created')}")
+        raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.create_company.already_created')}")
       else
-        raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.create_company.error')}")
+        raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.create_company.error')}")
       end
     rescue RestClient::Unauthorized, RestClient::InternalServerError, RestClient::ResourceNotFound
-      raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.create_company.error')}")
+      raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.create_company.error')}")
     end
   end
 
   def create_or_update_drivers(customer, current_admin)
     api_key = customer.devices[:fleet][:api_key]
-    raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.create_drivers.no_api_key')}") unless api_key
+    raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.create_drivers.no_api_key')}") unless api_key
 
     user = customer.users.first
     vehicles_with_email = customer.vehicles.select(&:contact_email)
@@ -205,7 +205,7 @@ class Fleet < DeviceBase
       rest_client_with_method(get_user_url(vehicle.contact_email), api_key, driver_params, :put)
       { email: vehicle.contact_email, updated: true }
     rescue RestClient::UnprocessableEntity, RestClient::Unauthorized, RestClient::InternalServerError, RestClient::ResourceNotFound
-      raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.update_drivers.update_failed.')}")
+      raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.update_drivers.update_failed.')}")
     end
   end
 
@@ -226,10 +226,10 @@ class Fleet < DeviceBase
         }
       end
     else
-      raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.get_vehicles_pos')}")
+      raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.get_vehicles_pos')}")
     end
   rescue RestClient::Unauthorized, RestClient::InternalServerError
-    raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.get_vehicles_pos')}")
+    raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.get_vehicles_pos')}")
   end
 
   def fetch_stops(customer, date, planning)
@@ -274,7 +274,7 @@ class Fleet < DeviceBase
     begin
       response = JSON.parse rest_client_get(url, customer.devices[:fleet][:api_key], nil), symbolize_names: true
     rescue RestClient::Unauthorized, RestClient::InternalServerError, RestClient::ResourceNotFound, RestClient::UnprocessableEntity
-      raise DeviceServiceError, "Fleet: #{I18n.t('errors.fleet.fetch_routes')}"
+      raise DeviceServiceError, "Mapo. Live: #{I18n.t('errors.fleet.fetch_routes')}"
     end
 
     response[:routes].map do |r|
@@ -300,10 +300,10 @@ class Fleet < DeviceBase
   end
 
   def send_route(customer, route, _options = {}, delete_mission = true)
-    raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.past_missions')}") if route.planning.date && route.planning.date < Date.today
+    raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.past_missions')}") if route.planning.date && route.planning.date < Date.today
 
     fleet_route = build_route_with_missions(route, customer)
-    raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.no_missions')}") if fleet_route[:missions].empty?
+    raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.no_missions')}") if fleet_route[:missions].empty?
 
     # FIRST: Try to know if the route has been created in the past
     method = :put
@@ -320,16 +320,16 @@ class Fleet < DeviceBase
       send_fleet_route(route.vehicle_usage.vehicle.devices[:fleet_user], customer.devices[:fleet][:api_key], fleet_route, method)
     end
   rescue RestClient::Unauthorized, RestClient::InternalServerError, RestClient::ResourceNotFound, RestClient::UnprocessableEntity
-    raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.set_missions')}")
+    raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.set_missions')}")
   end
 
   def clear_route(customer, route, delete_missions = true)
-    raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.past_missions')}") if route.planning.date && route.planning.date < Date.today
+    raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.past_missions')}") if route.planning.date && route.planning.date < Date.today
 
     fleet_route = build_route(route, nil)
     clear_fleet_route(route.vehicle_usage.vehicle.devices[:fleet_user], customer.devices[:fleet][:api_key], fleet_route, delete_missions)
   rescue RestClient::Unauthorized, RestClient::InternalServerError, RestClient::ResourceNotFound, RestClient::UnprocessableEntity
-    raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.clear_missions')}")
+    raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.clear_missions')}")
   end
 
   def decode_route_id_from_route_ref(external_ref)
@@ -360,7 +360,7 @@ class Fleet < DeviceBase
       { content_type: :json, accept: :json, Authorization: 'Token token=' + api_key }
     )
   rescue RestClient::RequestTimeout, Errno::ECONNREFUSED, SocketError
-    raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.timeout')}")
+    raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.timeout')}")
   end
 
   def rest_client_with_method(url, api_key, payload, method = :post)
@@ -372,7 +372,7 @@ class Fleet < DeviceBase
       timeout: TIMEOUT_VALUE
     )
   rescue RestClient::RequestTimeout
-    raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.timeout')}")
+    raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.timeout')}")
   end
 
   def rest_client_delete(url, api_key)
@@ -383,7 +383,7 @@ class Fleet < DeviceBase
       timeout: TIMEOUT_VALUE
     )
   rescue RestClient::RequestTimeout
-    raise DeviceServiceError.new("Fleet: #{I18n.t('errors.fleet.timeout')}")
+    raise DeviceServiceError.new("Mapo. Live: #{I18n.t('errors.fleet.timeout')}")
   end
 
   def set_company_url
