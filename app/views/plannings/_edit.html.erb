@@ -255,6 +255,7 @@ controller.js(
   update_stop_status: @planning.customer.enable_stop_status? && (@planning.date.nil? || @planning.date.between?(Time.now.beginning_of_day, Time.now.end_of_day)) && @planning.customer.device.available_stop_status?,
   callback_button: @callback_button,
   available_temperature: available_temperature?,
-  devices: planning_devices(@planning.customer)
+  devices: planning_devices(@planning.customer),
+  optimization_duration: optimization_duration(@planning.customer)
 )
 %>

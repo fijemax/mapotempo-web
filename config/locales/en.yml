@@ -1629,6 +1629,11 @@ en:
             overload_multiplier_ignore_help: The vehicle capacity is unlimited
             ignore: ignore
           optimize: Optimize
+          optimization_time: 'Optimization duration :'
+          optimize_min: 'At least :'
+          optimize_max: 'At most :'
+          optimize_less: 'Less than'
+          optimize-title: 'Optimization process duration. Does not take into account queue waiting time.'
           warning: 'Warning: all non planned destination will be assigned to vehicles during optimisation process. If you do not want this to happen, please lock ( <i class="fa fa-lock" ></i> ) unplanned destination.'
         optimizer:
           title: Optimization

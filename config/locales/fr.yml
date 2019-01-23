@@ -1745,6 +1745,11 @@
             'overload_multiplier_ignore_help': 'La capacité du véhicule est illimitée'
             'ignore': 'ignorer'
           'optimize': 'Optimiser'
+          'optimization_time': 'Durée d''optimisation :'
+          'optimize_min': 'Au minimum :'
+          'optimize_max': 'Au maximum :'
+          'optimize_less': 'Moins de'
+          'optimize-title': 'Durée du processus d''optimisation. Ne prend pas en compte le temps passé en file d''attente.'
           'warning': 'Attention : le comportement de l''optimisation a changé. Les arrêts non planifiés seront assignés à un véhicule durant l''optimisation. Si ce comportement n''est pas souhaité, veuillez les verrouiller.'
         'optimizer':
           'title': 'Optimisation'

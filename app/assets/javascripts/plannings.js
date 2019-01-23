@@ -266,7 +266,8 @@ var plannings_edit = function(params) {
       return vehicle.id;
     }),
     quantities = params.quantities,
-    routes_devices = [];
+    routes_devices = [],
+    optimisationDuration = params.optimization_duration;
   colorCodes.unshift('');
 
   function getZonings() {
@@ -795,7 +796,7 @@ var plannings_edit = function(params) {
     }
   });
 
-  var toggleModalWarning = (function () {
+  var toggleModalWarning = (function() {
     var _modalWarning = $(".modal-optim-warning");
 
     _modalWarning.find(".lock").on("click", function(e) {
@@ -816,6 +817,41 @@ var plannings_edit = function(params) {
     };
   })();
 
+  var optimizationTimer = (function() {
+    var _routesLength;
+
+    var displayOptimDuration = function displayOptimDuration() {
+      var _getOptimDuration = function _getOptimDuration() {
+        return {
+          min: _routesLength ? optimisationDuration.min * _routesLength : optimisationDuration.min,
+          max: _routesLength ? optimisationDuration.max * _routesLength : optimisationDuration.max
+        };
+      };
+      var duration = _getOptimDuration();
+
+      var minTxt = (duration.min < 60 ? I18n.t('plannings.edit.dialog.optimization.optimize_less') + ' 1' : Math.floor(duration.min / 60)) + ' minutes';
+      var maxTxt = (duration.max < 60 ? I18n.t('plannings.edit.dialog.optimization.optimize_less') + ' 1': Math.floor(duration.max / 60)) + ' minutes';
+
+      $('.optim-duration #min-optim-duration').text(I18n.t('plannings.edit.dialog.optimization.optimize_min') + ' ' + minTxt);
+      $('.optim-duration #max-optim-duration').text(I18n.t('plannings.edit.dialog.optimization.optimize_max') + ' ' + maxTxt);
+    };
+
+    var setOptimDuration = function setOptimDuration(routesLength) {
+      _routesLength = routesLength;
+      return this;
+    };
+
+    var getNbRoute = function getNbRoute() {
+      return _routesLength;
+    };
+
+    return {
+      displayOptimDuration: displayOptimDuration,
+      setOptimDuration: setOptimDuration,
+      getNbRoute: getNbRoute
+    };
+  })();
+
   $('#optimize_all').click(function() {
     $('#optimization-route_id').val('').trigger('change');
     toggleModalWarning();
@@ -826,6 +862,7 @@ var plannings_edit = function(params) {
     var routeId = $(this).val();
     if (routeId) {
       $('div#optimization-global').hide();
+      optimizationTimer.setOptimDuration();
       var sizeActive = $('li[data-route_id=' + routeId + '] [data-size-active]');
       $('div#optimization-active').css({display: (sizeActive.attr('data-size-active') == sizeActive.attr('data-size')) ? 'none' : 'block'});
       var route = routes.filter(function(route) {
@@ -840,6 +877,8 @@ var plannings_edit = function(params) {
       $('#router-dimension-value').html(I18n.t(dimension));
     }
     else {
+      var routeLen = $('li[data-color]').find('.fa-unlock').length;
+      optimizationTimer.setOptimDuration(routeLen);
       $('div#optimization-global').show();
       var sizeRoutes = 0;
       var allStopsActive = true;
@@ -861,6 +900,8 @@ var plannings_edit = function(params) {
         .filter(function(elt, idx, array) { return idx == array.indexOf(elt); });
       $('#router-dimension-value').html(dimensions.map(function(dim) { dim = 'plannings.edit.dialog.optimization.vehicles.' + dim; return I18n.t(dim); }).join(' / '));
     }
+
+    optimizationTimer.displayOptimDuration();
     vehicleCostLate();
   });
   // FIXME: ortools is not able to support non null vehicle late multiplier for global optim
@@ -1861,6 +1902,14 @@ var plannings_edit = function(params) {
   });
 
   var displayPlanningFirstTime = function(data) {
+
+    // Display optimization duration in modal on page reload
+    if (data.optimizer) {
+      var len = data.optimizer.dispatch_params_delayed_job.routes ?
+        data.optimizer.dispatch_params_delayed_job.routes.length : data.optimizer.dispatch_params_delayed_job.nb_route;
+      optimizationTimer.setOptimDuration(len).displayOptimDuration();
+    }
+
     // WARNING: data can be without routes here in case of optimization with delayed job
     displayPlanning(data, {
       firstTime: true
@@ -1949,26 +1998,34 @@ var plannings_edit = function(params) {
   var dialog_optimizer;
   var initOptimizerDialog = function() {
     hideNotices(); // Clear Failed Optimization Notices
+
     dialog_optimizer = bootstrap_dialog({
       title: I18n.t('plannings.edit.dialog.optimizer.title'),
       icon: 'fa-gear',
       message: SMT['modals/optimize']({
         i18n: mustache_i18n
-      })
+      }),
+      footer: '<div class="optim-duration col-xs-6">'
+          + '<h5>' + I18n.t('plannings.edit.dialog.optimization.optimization_time') + '</h5>'
+          + '<div id="min-optim-duration"></div>'
+          + '<div id="max-optim-duration"></div>'
+        + '</div>'
     });
+
+    $(".optim-duration h5").prop('title', I18n.t('plannings.edit.dialog.optimization.optimize-title'));
   };
   initOptimizerDialog();
 
   $('#optimize').click(function() {
     initOptimizerDialog();
 
+    optimizationTimer.displayOptimDuration();
     var routeId = $('#optimization-route_id').val();
     var ignore_overload_multipliers = Array();
     $("input[name^='overload_multiplier']:checked").each(function () {
       if ($(this).val() == 'ignore')
         ignore_overload_multipliers.push({unit_id: $(this).attr('unit-id'), ignore: true})
     })
-
     $.ajax({
       type: 'GET',
       url: '/plannings/' + planning_id + (routeId ? '/' + routeId : '') + '/optimize.json',
@@ -1976,7 +2033,8 @@ var plannings_edit = function(params) {
         with_stops: routeId ? true : withStopsInSidePanel,
         active_only: $('input[name="active_only"]:checked').val(),
         global: !routeId && (($('input[name="sticky_vehicle"]:checked').val() == 'true') ? 'false' : 'true'),
-        ignore_overload_multipliers: ignore_overload_multipliers
+        ignore_overload_multipliers: ignore_overload_multipliers,
+        nb_route: optimizationTimer.getNbRoute()
       },
       beforeSend: beforeSendWaiting,
       success: function(data) {

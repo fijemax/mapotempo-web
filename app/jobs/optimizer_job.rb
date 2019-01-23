@@ -17,7 +17,7 @@
 #
 require 'optim/ort'
 
-class OptimizerJob < Job.new(:planning_id, :route_id, :global, :active_only, :ignore_overload_multipliers)
+class OptimizerJob < Job.new(:planning_id, :route_id, :global, :active_only, :ignore_overload_multipliers, :nb_route)
   @@optimize_time = Mapotempo::Application.config.optimize_time
   @@optimize_time_force = Mapotempo::Application.config.optimize_time_force
   @@max_split_size = Mapotempo::Application.config.optimize_max_split_size
@@ -35,9 +35,11 @@ class OptimizerJob < Job.new(:planning_id, :route_id, :global, :active_only, :ig
     job_progress_save '0;0;'
     planning = Planning.where(id: planning_id).first!
     routes = planning.routes.select { |r|
-      (route_id && r.id == route_id) || (!route_id && !global && r.vehicle_usage_id && r.size_active > 1) || (!route_id && global)
+      (route_id && r.id == route_id) || (!route_id && !global && r.vehicle_usage_id && r.size_active > 0) || (!route_id && global)
     }.reject(&:locked)
+
     routes.unshift(planning.routes.first) if !global && !planning.routes.first[:locked] && !route_id
+
     optimize_time = planning.customer.optimization_time || @@optimize_time
 
     bars = Array.new(2, 0)

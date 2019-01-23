@@ -527,6 +527,7 @@ class Route < ApplicationRecord
     self.outdated = true
   end
 
+  # Split stops by active status, position and rest
   def stops_segregate(active_only = true)
     stops.group_by{ |stop| (!active_only ? true : stop.active) && (stop.position? || stop.is_a?(StopRest)) }
   end

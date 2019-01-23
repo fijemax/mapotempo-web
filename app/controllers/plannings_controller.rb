@@ -284,9 +284,10 @@ class PlanningsController < ApplicationController
   def optimize
     global = ValueToBoolean::value_to_boolean(params[:global])
     active_only = ValueToBoolean::value_to_boolean(params[:active_only])
+    nb_route = params[:nb_route].nil? ? 0 : Integer(params[:nb_route])
     respond_to do |format|
       begin
-        if Optimizer.optimize(@planning, nil, { global: global, synchronous: false, active_only: active_only, ignore_overload_multipliers: ignore_overload_multipliers }) && @planning.customer.save!
+        if Optimizer.optimize(@planning, nil, { global: global, synchronous: false, active_only: active_only, ignore_overload_multipliers: ignore_overload_multipliers, nb_route: nb_route}) && @planning.customer.save!
           format.json { render action: 'show', location: @planning }
         else
           errors = @planning.errors.full_messages.size.zero? ? @planning.customer.errors.full_messages : @planning.errors.full_messages

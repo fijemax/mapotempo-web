@@ -29,6 +29,13 @@ class Job < Struct
     end.join
   end
 
+  def self.nb_routes(job)
+    if job && job.handler
+      match = job.handler.match(/nb_route: ([0-9]+)/)
+      !match || Integer(match[1])
+    end
+  end
+
   def self.on_planning(job, planning_id)
     if job && job.handler
       match = job.handler.match(/planning_id: ([0-9]+)/)

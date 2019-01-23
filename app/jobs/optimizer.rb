@@ -29,7 +29,7 @@ class Optimizer
   @@force_start = Mapotempo::Application.config.optimize_force_start
   @@optimize_minimal_time = Mapotempo::Application.config.optimize_minimal_time
 
-  def self.optimize(planning, route, options = { global: false, synchronous: false, active_only: true, ignore_overload_multipliers: [] })
+  def self.optimize(planning, route, options = { global: false, synchronous: false, active_only: true, ignore_overload_multipliers: [], nb_route: 0 })
     optimize_time = planning.customer.optimization_time || @@optimize_time
     if route && route.size_active <= 1 && options[:active_only]
       # Nothing to optimize
@@ -41,14 +41,16 @@ class Optimizer
         planning.errors.add(:base, I18n.t('errors.planning.already_optimizing'))
         false
       else
-        planning.customer.job_optimizer = Delayed::Job.enqueue(OptimizerJob.new(planning.id, route && route.id, options[:global], options[:active_only], options[:ignore_overload_multipliers]))
+        planning.customer.job_optimizer = Delayed::Job.enqueue(OptimizerJob.new(planning.id, route && route.id, options[:global], options[:active_only], options[:ignore_overload_multipliers], options[:nb_route]))
         planning.customer.job_optimizer.save!
       end
     else
       routes = planning.routes.select { |r|
         (route && r.id == route.id) || (!route && !options[:global] && r.vehicle_usage_id && r.size_active > 1) || (!route && options[:global])
       }.reject(&:locked)
+
       routes.unshift(planning.routes.first) if !options[:global] && !planning.routes.first[:locked] && !route
+
       optimum = unless routes.select(&:vehicle_usage_id).empty?
         planning.optimize(routes, options) do |positions, services, vehicles|
           Mapotempo::Application.config.optimizer.optimize(

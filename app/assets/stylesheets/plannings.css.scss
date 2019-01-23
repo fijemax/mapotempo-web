@@ -616,6 +616,14 @@ $sidebar-margins: 10px;
       margin-right: 10px;
     }
   }
+
+  .optim-duration {
+    text-align: left;
+    padding-left: 0px;
+    h5 {
+      margin-top: 0px;
+    }
+  }
 }
 
 .temperature-info {
@@ -713,4 +721,3 @@ $sidebar-margins: 10px;
     margin-left: 5px;
   }
 }
-

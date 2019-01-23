@@ -434,7 +434,7 @@ class Planning < ApplicationRecord
             skills: vehicle_skills
           }
         }
-        # Remove out-of-route if no global optimization
+        # Remove unplanned stops if no global optimization
         optimizer.call(positions, services, vehicles)[(routes.find{ |r| !r.vehicle_usage? } ? 0 : 1)..-1]
       }
     }
