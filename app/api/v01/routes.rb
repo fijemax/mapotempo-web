@@ -37,13 +37,11 @@ class V01::Routes < Grape::API
       end
       @route || raise(ActiveRecord::RecordNotFound.new)
     end
-
-    ID_DESC = 'Id or the ref field value, then use "ref:[value]".'.freeze
   end
 
   resource :plannings do
     params do
-      requires :planning_id, type: String, desc: ID_DESC
+      requires :planning_id, type: String, desc: SharedParams::ID_DESC
     end
     segment '/:planning_id' do
       resource :routes do
@@ -51,7 +49,7 @@ class V01::Routes < Grape::API
           nickname: 'updateRoute',
           success: V01::Entities::Route
         params do
-          requires :id, type: String, desc: ID_DESC
+          requires :id, type: String, desc: SharedParams::ID_DESC
           use :params_from_entity, entity: V01::Entities::Route.documentation.slice(:hidden, :locked, :color)
           optional :geojson, type: Symbol, values: [:true, :false, :point, :polyline], default: :false, desc: 'Fill the geojson field with route geometry: `point` to return only points, `polyline` to return with encoded linestring.'
         end
@@ -65,7 +63,7 @@ class V01::Routes < Grape::API
           nickname: 'activationStops',
           success: V01::Entities::Route
         params do
-          requires :id, type: String, desc: ID_DESC
+          requires :id, type: String, desc: SharedParams::ID_DESC
           requires :active, type: String, values: ['all', 'reverse', 'none']
           optional :geojson, type: Symbol, values: [:true, :false, :point, :polyline], default: :false, desc: 'Fill the geojson field with route geometry: `point` to return only points, `polyline` to return with encoded linestring.'
         end
@@ -83,7 +81,7 @@ class V01::Routes < Grape::API
           detail: 'Set a new A route (or vehicle) for a visit which was in a previous B route in the same planning. Automatic_insert parameter allows to compute index of the stops created for visits.',
           nickname: 'moveVisits'
         params do
-          requires :id, type: String, desc: ID_DESC
+          requires :id, type: String, desc: SharedParams::ID_DESC
           requires :visit_ids, type: Array[String], desc: 'Ids separated by comma. You can specify ref (not containing comma) instead of id, in this case you have to add "ref:" before each ref, e.g. ref:ref1,ref:ref2,ref:ref3.', documentation: {param_type: 'form'}, coerce_with: CoerceArrayString
           optional :automatic_insert, type: Boolean, desc: 'If true, the best index in the route is automatically computed to have minimum impact on total route distance (without taking into account constraints like open/close, you have to start a new optimization if needed).'
         end
@@ -109,7 +107,7 @@ class V01::Routes < Grape::API
           detail: 'Get the shortest route in time or distance.',
           nickname: 'optimizeRoute'
         params do
-          requires :id, type: String, desc: ID_DESC
+          requires :id, type: String, desc: SharedParams::ID_DESC
           optional :details, type: Boolean, desc: 'Output Route Details', default: false
           optional :synchronous, type: Boolean, desc: 'Synchronous', default: true
           optional :all_stops, type: Boolean, desc: 'Deprecated (Use active_only instead)'
@@ -143,7 +141,7 @@ class V01::Routes < Grape::API
           nickname: 'reverseStopsOrder',
           success: V01::Entities::Route
         params do
-          requires :id, type: String, desc: ID_DESC
+          requires :id, type: String, desc: SharedParams::ID_DESC
         end
         patch ':id/reverse_order' do
           Stop.includes_destinations.scoping do
@@ -159,7 +157,7 @@ class V01::Routes < Grape::API
           detail: 'Send SMS for each stop visit of the specified route.',
           nickname: 'sendSMS'
         params do
-          requires :id, type: String, desc: ID_DESC
+          requires :id, type: String, desc: SharedParams::ID_DESC
         end
         get ':id/send_sms' do
           if current_customer.enable_sms && current_customer.reseller.sms_api_key
@@ -177,7 +175,7 @@ class V01::Routes < Grape::API
           nickname: 'getRouteByVehicle',
           success: V01::Entities::Route
         params do
-          requires :id, type: String, desc: ID_DESC
+          requires :id, type: String, desc: SharedParams::ID_DESC
           optional :geojson, type: Symbol, values: [:true, :false, :point, :polyline], default: :false, desc: 'Fill the geojson field with route geometry: `point` to return only points, `polyline` to return with encoded linestring.'
         end
         get ':id' do

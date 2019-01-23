@@ -30,8 +30,6 @@ class V01::Users < Grape::API
         p.permit(:layer_id, :url_click2call, :time_zone, :locale, :prefered_unit)
       end
     end
-
-    ID_DESC = 'Id or the ref field value, then use "ref:[value]".'.freeze
   end
 
   resource :users do
@@ -56,7 +54,7 @@ class V01::Users < Grape::API
       nickname: 'getUser',
       success: V01::Entities::User
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
     end
     get ':id' do
       id = ParseIdsRefs.read(params[:id])
@@ -102,7 +100,7 @@ class V01::Users < Grape::API
       nickname: 'updateUser',
       success: V01::Entities::User
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       use :params_from_entity, entity: V01::Entities::User.documentation.except(:id)
     end
     put ':id' do
@@ -116,7 +114,7 @@ class V01::Users < Grape::API
       detail: 'Only available with an admin api_key.',
       nickname: 'deleteUser'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
     end
     delete ':id' do
       if @current_user.admin?

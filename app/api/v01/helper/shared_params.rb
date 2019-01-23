@@ -35,5 +35,8 @@ module SharedParams
       send(v[:required] ? :requires : :optional, k, v.except(:required, :is_array, :param_type))
     }
   end
+
+  ID_DESC = 'Id or the ref field value, then use "ref:[value]".'.freeze
+
 end
 

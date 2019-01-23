@@ -76,8 +76,6 @@ class V01::Vehicles < Grape::API
       p = p[:vehicle] if p.key?(:vehicle)
       p.permit(:open, :close, :store_start_id, :store_stop_id, :store_rest_id, :rest_start, :rest_stop, :rest_duration)
     end
-
-    ID_DESC = 'Id or the ref field value, then use "ref:[value]".'.freeze
   end
 
   resource :vehicles do
@@ -179,7 +177,7 @@ class V01::Vehicles < Grape::API
       nickname: 'getVehicle',
       success: V01::Entities::Vehicle
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
     end
     get ':id' do
       id = ParseIdsRefs.read(params[:id])
@@ -190,7 +188,7 @@ class V01::Vehicles < Grape::API
       nickname: 'updateVehicle',
       success: V01::Entities::Vehicle
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       use :params_from_entity, entity: V01::Entities::Vehicle.documentation.except(
           :id,
           :router_options
@@ -313,7 +311,7 @@ class V01::Vehicles < Grape::API
       detail: detailDelete,
       nickname: 'deleteVehicle'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
     end
     delete ':id' do
       id = ParseIdsRefs.read(params[:id])

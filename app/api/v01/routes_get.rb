@@ -42,8 +42,6 @@ class V01::RoutesGet < Grape::API
         present routes, with: V01::Entities::Route, geojson: params[:geojson]
       end
     end
-
-    ID_DESC = 'ID or REF ref:[value]'.freeze
   end
 
   resource :routes do
@@ -71,7 +69,7 @@ class V01::RoutesGet < Grape::API
 
   resource :plannings do
     params do
-      requires :planning_id, type: String, desc: ID_DESC
+      requires :planning_id, type: String, desc: SharedParams::ID_DESC
     end
     segment '/:planning_id' do
       resource :routes do
@@ -101,7 +99,7 @@ class V01::RoutesGet < Grape::API
           nickname: 'getRoute',
           success: V01::Entities::Route
         params do
-          requires :id, type: String, desc: ID_DESC
+          requires :id, type: String, desc: SharedParams::ID_DESC
           optional :geojson, type: Symbol, values: [:true, :false, :point, :polyline], default: :false, desc: 'Fill the geojson field with route geometry, when using json output. For geojson output, param can be only set to `point` to return only points, `polyline` to return with encoded linestring.'
         end
         get ':id' do

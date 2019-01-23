@@ -26,8 +26,6 @@ class V01::DeliverableUnits < Grape::API
       p = p[:deliverable_unit] if p.key?(:deliverable_unit)
       p.permit(:label, :ref, :default_quantity, :optimization_overload_multiplier, :icon)
     end
-
-    ID_DESC = 'Id or the ref field value, then use "ref:[value]".'.freeze
   end
 
   resource :deliverable_units do
@@ -74,7 +72,7 @@ class V01::DeliverableUnits < Grape::API
       nickname: 'updateDeliverableUnit',
       entity: V01::Entities::DeliverableUnit
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       use :params_from_entity, entity: V01::Entities::DeliverableUnit.documentation.except(:id)
     end
     put ':id' do
@@ -87,7 +85,7 @@ class V01::DeliverableUnits < Grape::API
     desc 'Delete deliverable unit.',
       nickname: 'deleteDeliverableUnit'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
     end
     delete ':id' do
       id = ParseIdsRefs.read(params[:id])

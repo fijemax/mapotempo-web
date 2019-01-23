@@ -28,12 +28,10 @@ class V01::Stores < Grape::API
       p = p[:store] if p.key?(:store)
       p.permit(:ref, :name, :street, :postalcode, :city, :state, :country, :lat, :lng, :geocoding_accuracy, :geocoding_level, :color, :icon, :icon_size)
     end
-
-    ID_DESC = 'Id or the ref field value, then use "ref:[value]".'.freeze
   end
 
   resource :stores do
-    desc 'Fetch customer\'s stores. At least one store exists per customer.',
+  desc 'Fetch customer\'s stores. At least one store exists per customer.',
       nickname: 'getStores',
       is_array: true,
       success: V01::Entities::Store
@@ -76,7 +74,7 @@ class V01::Stores < Grape::API
       nickname: 'getStore',
       success: V01::Entities::Store
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
     end
     get ':id' do
       id = ParseIdsRefs.read(params[:id])
@@ -125,7 +123,7 @@ class V01::Stores < Grape::API
       nickname: 'updateStore',
       success: V01::Entities::Store
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       use :params_from_entity, entity: V01::Entities::Store.documentation.except(:id).deep_merge(
         geocoding_accuracy: { desc: 'Must be inside 0..1 range.' }
       )
@@ -143,7 +141,7 @@ class V01::Stores < Grape::API
       detail: 'At least one remaining store is required after deletion.',
       nickname: 'deleteStore'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
     end
     delete ':id' do
       id = ParseIdsRefs.read(params[:id])

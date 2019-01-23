@@ -26,8 +26,6 @@ class V01::Tags < Grape::API
       p = p[:tag] if p.key?(:tag)
       p.permit(:label, :ref, :color, :icon, :icon_size)
     end
-
-    ID_DESC = 'Id or the ref field value, then use "ref:[value]".'.freeze
   end
 
   resource :tags do
@@ -51,7 +49,7 @@ class V01::Tags < Grape::API
          nickname: 'getTag',
          success: V01::Entities::Tag
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
     end
     get ':id' do
       id = ParseIdsRefs.read(params[:id])
@@ -77,7 +75,7 @@ class V01::Tags < Grape::API
          nickname: 'updateTag',
          success: V01::Entities::Tag
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       use :params_from_entity, entity: V01::Entities::Tag.documentation.except(:id)
     end
     put ':id' do
@@ -90,7 +88,7 @@ class V01::Tags < Grape::API
     desc 'Delete tag.',
          nickname: 'deleteTag'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
     end
     delete ':id' do
       id = ParseIdsRefs.read(params[:id])

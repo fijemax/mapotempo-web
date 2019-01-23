@@ -49,8 +49,6 @@ class V01::Destinations < Grape::API
 
       p.permit(:ref, :name, :street, :detail, :postalcode, :city, :state, :country, :lat, :lng, :comment, :phone_number, :geocoding_accuracy, :geocoding_level, tag_ids: [], visits_attributes: [:id, :ref, :take_over, :open1, :close1, :open2, :close2, :priority, tag_ids: [], quantities: current_customer.deliverable_units.map{ |du| du.id.to_s }])
     end
-
-    ID_DESC = 'Id or the ref field value, then use "ref:[value]".'.freeze
   end
 
   resource :destinations do
@@ -76,7 +74,7 @@ class V01::Destinations < Grape::API
       nickname: 'getDestination',
       success: V01::Entities::Destination
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
     end
     get ':id' do
       id = ParseIdsRefs.read(params[:id])
@@ -155,7 +153,7 @@ class V01::Destinations < Grape::API
       nickname: 'updateDestination',
       success: V01::Entities::Destination
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       use :params_from_entity, entity: V01::Entities::Destination.documentation.except(:id, :tag_ids).deep_merge(
         geocoding_accuracy: { desc: 'Must be inside 0..1 range.' }
       )
@@ -173,7 +171,7 @@ class V01::Destinations < Grape::API
     desc 'Delete destination.',
       nickname: 'deleteDestination'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
     end
     delete ':id' do
       id = ParseIdsRefs.read(params[:id])

@@ -18,15 +18,13 @@
 
 class V01::VisitsByTags < Grape::API
 
-  helpers do
-    ID_DESC = 'Id or the ref field value, then use "ref:[value]".'.freeze
-  end
+  helpers SharedParams
 
   resource :visits_by_tags do
     desc 'Get visit with corresponding tag id or tag ref',
       nickname: 'VisitsByTags'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
     end
     get ':id' do
       destinations = current_customer.destinations.includes_visits

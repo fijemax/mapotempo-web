@@ -31,8 +31,6 @@ class V01::Plannings < Grape::API
       p[:zoning_ids] = [p[:zoning_id]] if p[:zoning_id] && (!p[:zoning_ids] || p[:zoning_ids].empty?)
       p.permit(:name, :ref, :date, :begin_date, :end_date, :active, :vehicle_usage_set_id, :tag_operation, tag_ids: [], zoning_ids: [])
     end
-
-    ID_DESC = 'Id or the ref field value, then use "ref:[value]".'.freeze
   end
 
   # Planning get is located in plannings_get file because it needs to return specific content types (js, xml and ics)
@@ -62,7 +60,7 @@ class V01::Plannings < Grape::API
       nickname: 'updatePlanning',
       success: V01::Entities::Planning
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       use :params_from_entity, entity: V01::Entities::Planning.documentation.except(:id, :route_ids, :outdated, :tag_ids)
       optional :geojson, type: Symbol, values: [:true, :false, :point, :polyline], default: :false, desc: 'Fill the geojson field with route geometry: `point` to return only points, `polyline` to return with encoded linestring.'
     end
@@ -75,7 +73,7 @@ class V01::Plannings < Grape::API
     desc 'Delete planning.',
       nickname: 'deletePlanning'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
     end
     delete ':id' do
       Route.includes_destinations.scoping do
@@ -105,7 +103,7 @@ class V01::Plannings < Grape::API
       nickname: 'refreshPlanning',
       success: V01::Entities::Planning
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       optional :geojson, type: Symbol, values: [:true, :false, :point, :polyline], default: :false, desc: 'Fill the geojson field with route geometry: `point` to return only points, `polyline` to return with encoded linestring.'
     end
     get ':id/refresh' do
@@ -123,7 +121,7 @@ class V01::Plannings < Grape::API
       detail: 'Switch vehicle associated to one route with another existing vehicle.',
       nickname: 'switchVehicles'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       requires :route_id, type: Integer, desc: 'Route id to switch associated vehicle.'
       requires :vehicle_usage_id, type: Integer, desc: 'New vehicle id to associate to the route.'
       optional :details, type: Boolean, desc: 'Output complete planning.', default: false
@@ -154,7 +152,7 @@ class V01::Plannings < Grape::API
       detail: 'Insert automatically one or more stops in best routes and on best positions to have minimal influence on route\'s total time (this operation doesn\'t take into account time windows if they exist...). You should use this operation with existing stops in current planning\'s routes. In addition, you should not use this operation with many stops. You should use instead zoning (with automatic clustering creation for instance) to set multiple stops in each available route.',
       nickname: 'automaticInsertStop'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       requires :stop_ids, type: Array[Integer], desc: 'Ids separated by comma. You should not have too many stops.', documentation: { param_type: 'form' }, coerce_with: CoerceArrayInteger
       optional :max_time, type: Float, desc: 'Maximum time for best routes (in seconds).'
       optional :max_distance, type: Float, desc: 'Maximum distance for best routes (in meters).'
@@ -190,7 +188,7 @@ class V01::Plannings < Grape::API
       detail: 'Apply zoning by assign stops to vehicles using the corresponding zones.',
       nickname: 'applyZonings'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       optional :details, type: Boolean, desc: 'Output route details', default: false
       optional :geojson, type: Symbol, values: [:true, :false, :point, :polyline], default: :false, desc: 'Fill the geojson field with route geometry: `point` to return only points, `polyline` to return with encoded linestring.'
     end
@@ -215,7 +213,7 @@ class V01::Plannings < Grape::API
       detail: 'Optimize all unlocked routes by keeping visits in same route or not.',
       nickname: 'optimizeRoutes'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       optional :global, type: Boolean, desc: 'Use global optimization and move visits between routes if needed', default: false
       optional :details, type: Boolean, desc: 'Output route details', default: false
       optional :synchronous, type: Boolean, desc: 'Synchronous', default: true
@@ -246,7 +244,7 @@ class V01::Plannings < Grape::API
       nickname: 'clonePlanning',
       success: V01::Entities::Planning
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       optional :geojson, type: Symbol, values: [:true, :false, :point, :polyline], default: :false, desc: 'Fill the geojson field with route geometry: `point` to return only points, `polyline` to return with encoded linestring.'
     end
     patch ':id/duplicate' do
@@ -263,7 +261,7 @@ class V01::Plannings < Grape::API
       nickname: 'useOrderArray',
       success: V01::Entities::Planning
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       requires :order_array_id, type: Integer
       requires :shift, type: Integer
       optional :geojson, type: Symbol, values: [:true, :false, :point, :polyline], default: :false, desc: 'Fill the geojson field with route geometry: `point` to return only points, `polyline` to return with encoded linestring.'
@@ -284,7 +282,7 @@ class V01::Plannings < Grape::API
     desc 'Update routes visibility and lock.',
       nickname: 'updateRoutes'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       requires :action, type: String, values: %w(visibility toggle lock), desc: 'Toogle is deprecated, use visibility instead'
       requires :selection, type: String, values: %w(all reverse none), desc: 'Choose between: show/lock all routes, toggle all routes or hide/unlock all routes'
       optional :route_ids, type: Array[Integer], documentation: { param_type: 'form' }, coerce_with: CoerceArrayInteger, desc: 'Ids separated by comma.'
@@ -326,7 +324,7 @@ class V01::Plannings < Grape::API
       nickname: 'updateStopsStatus',
       success: V01::Entities::Planning
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       optional :details, type: Boolean, desc: 'Output route details', default: false
     end
     patch ':id/update_stops_status' do
@@ -351,7 +349,7 @@ class V01::Plannings < Grape::API
       detail: 'Send SMS for each stop visit of each routes',
       nickname: 'sendSMS'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
     end
     get ':id/send_sms' do
       if current_customer.enable_sms && current_customer.reseller.sms_api_key

@@ -28,8 +28,6 @@ class V01::PlanningsGet < Grape::API
   default_format :json
 
   helpers do
-    ID_DESC = 'ID or REF ref:[value]'.freeze
-
     def get_format_routes_email(planning_ids)
       hash = current_customer.vehicles.select(&:contact_email).group_by(&:contact_email)
       struct = hash.each{ |email, vehicles|
@@ -96,7 +94,7 @@ class V01::PlanningsGet < Grape::API
       nickname: 'getPlanning',
       success: V01::Entities::Planning
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       optional :geojson, type: Symbol, values: [:true, :false, :point, :polyline], default: :false, desc: 'Fill the geojson field with route geometry, when using json output. For geojson output, param can be only set to `point` to return only points, `polyline` to return with encoded linestring.'
       optional :quantities, type: Boolean, default: false, desc: 'Include the quantities when using geojson output.'
       optional :stores, type: Boolean, default: false, desc: 'Include the stores in geojson output.'

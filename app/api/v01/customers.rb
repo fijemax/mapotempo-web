@@ -125,7 +125,6 @@ class V01::Customers < Grape::API
       end
     end
 
-    ID_DESC = 'Id or the ref field value, then use "ref:[value]".'.freeze
   end
 
   resource :customers do
@@ -148,7 +147,7 @@ class V01::Customers < Grape::API
       is_array: true,
       success: V01::Entities::Customer
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
     end
     get ':id' do
       if @current_user.admin?
@@ -181,7 +180,7 @@ class V01::Customers < Grape::API
       nickname: 'updateCustomer',
       success: V01::Entities::Customer
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       use :params_from_entity, entity: V01::Entities::Customer.documentation.except(
         :id,
         :store_ids,
@@ -281,7 +280,7 @@ class V01::Customers < Grape::API
       detail: 'Only available with an admin api_key.',
       nickname: 'deleteCustomer'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
     end
     delete ':id' do
       if @current_user.admin?
@@ -297,7 +296,7 @@ class V01::Customers < Grape::API
       detail: 'Return asynchronous job (like geocoding, optimizer) currently runned for the customer.',
       nickname: 'getJob'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       requires :job_id, type: Integer
     end
     get ':id/job/:job_id' do
@@ -321,7 +320,7 @@ class V01::Customers < Grape::API
       detail: 'Cancel asynchronous job (like geocoding, optimizer) currently runned for the customer.',
       nickname: 'deleteJob'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       requires :job_id, type: Integer
     end
     delete ':id/job/:job_id' do
@@ -346,7 +345,7 @@ class V01::Customers < Grape::API
       detail: 'Create a copy of customer account. Only available with an admin api_key.',
       nickname: 'duplicateCustomer'
     params do
-      requires :id, type: String, desc: ID_DESC
+      requires :id, type: String, desc: SharedParams::ID_DESC
       optional :exclude_users, type: Boolean, default: false
     end
     put ':id/duplicate' do

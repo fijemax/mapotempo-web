@@ -45,13 +45,11 @@ class V01::Visits < Grape::API
       deliverable_unit_ids = current_customer.deliverable_units.map{ |du| du.id.to_s }
       p.permit(:ref, :take_over, :open1, :close1, :open2, :close2, :priority, tag_ids: [], quantities: deliverable_unit_ids, quantities_operations: deliverable_unit_ids)
     end
-
-    ID_DESC = 'Id or the ref field value, then use "ref:[value]".'.freeze
   end
 
   resource :destinations do
     params do
-      requires :destination_id, type: String, desc: ID_DESC
+      requires :destination_id, type: String, desc: SharedParams::ID_DESC
     end
     segment '/:destination_id' do
 
@@ -79,7 +77,7 @@ class V01::Visits < Grape::API
           nickname: 'getVisit',
           success: V01::Entities::Visit
         params do
-          requires :id, type: String, desc: ID_DESC
+          requires :id, type: String, desc: SharedParams::ID_DESC
         end
         get ':id' do
           destination_id = ParseIdsRefs.read(params[:destination_id])
@@ -129,7 +127,7 @@ class V01::Visits < Grape::API
           nickname: 'updateVisit',
           success: V01::Entities::Visit
         params do
-          requires :id, type: String, desc: ID_DESC
+          requires :id, type: String, desc: SharedParams::ID_DESC
           use :params_from_entity, entity: V01::Entities::Visit.documentation.except(
               :id,
               :destination_id,
@@ -166,7 +164,7 @@ class V01::Visits < Grape::API
         desc 'Delete visit.',
           nickname: 'deleteVisit'
         params do
-          requires :id, type: String, desc: ID_DESC
+          requires :id, type: String, desc: SharedParams::ID_DESC
         end
         delete ':id' do
           destination_id = ParseIdsRefs.read(params[:destination_id])
