@@ -649,7 +649,7 @@ class PlanningTest < ActiveSupport::TestCase
     all_optim = planning.optimize(planning.routes, { global: false, active_only: true }) { |*a|
       optimizer_global(*a)
     }
-    planning.set_stops(planning.routes, all_optim, true)
+    planning.set_stops(planning.routes, all_optim, { global: false, active_only: true })
     active_only = planning.routes.third.stops.map(&:id)
 
     assert_equal active_stops.size, active_only.size

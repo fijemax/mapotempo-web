@@ -82,7 +82,7 @@ class OptimizerJob < Job.new(:planning_id, :route_id, :global, :active_only, :ig
 
     # Apply result
     if optimum
-      planning.set_stops(routes, optimum, active_only)
+      planning.set_stops(routes, optimum, { global: global, active_only: active_only })
       routes.each { |r|
         r.reload # Refresh stops order
         r.compute

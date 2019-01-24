@@ -449,7 +449,7 @@ class Planning < ApplicationRecord
     o
   end
 
-  def set_stops(routes, stop_ids, active_only = true)
+  def set_stops(routes, stop_ids, options = { global: false, active_only: true })
     raise 'Invalid routes count' unless routes.size == stop_ids.size
     Route.transaction do
       stops_count = routes.collect{ |r| r.stops.size }.reduce(&:+)
@@ -461,10 +461,11 @@ class Planning < ApplicationRecord
       end
 
       routes.each_with_index{ |route, index|
-        stops_ = route.stops_segregate(active_only) # Split stops according to stop active statement
+        stops_ = route.stops_segregate(options[:active_only]) # Split stops according to stop active statement
 
-        # Get ordered stops in current route
-        ordered_stops = routes.flat_map{ |r| r.stops.select{ |s| stop_ids[index].include? s.id } }.sort_by{ |s| stop_ids[index].index s.id }
+        # Fetch sorted stops returned by optim from all routes
+        # index dependent: route[0] == stop_ids[0]
+        ordered_stops = routes.flat_map{ |r| r.stops.select{ |s| stop_ids[index].include? s.id }}.sort_by { |s| stop_ids[index].index s.id }
 
         # 1. Set route and index (active stops returned by optim for instance)
         i = 0
@@ -473,6 +474,15 @@ class Planning < ApplicationRecord
           if stop.is_a?(StopRest) && !route.vehicle_usage?
             flat_stop_ids.delete stop.id
           else
+
+            # 'Optim. each', actual route contains unplanned and stop asigned to other route, then set stop to unactive
+            if !options[:global] && !route.vehicle_usage? && index == 0 && route.id != stop.route_id
+              stop.active = false;
+              stop.index = i += 1
+              stop.save!
+              next
+            end
+
             stop.active = true if route.vehicle_usage? && inactive_stop_ids.exclude?(stop.id)
             stop.index = i += 1
             stop.time = stop.distance = stop.drive_time = stop.out_of_window = stop.out_of_capacity = stop.out_of_drive_time = stop.out_of_work_time = stop.out_of_max_distance = nil

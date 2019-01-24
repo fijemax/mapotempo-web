@@ -69,7 +69,7 @@ class Optimizer
       end
 
       if optimum
-        planning.set_stops(routes, optimum, options[:active_only])
+        planning.set_stops(routes, optimum, { global: options[:global], active_only: options[:active_only] })
         routes.each{ |r|
           r.reload # Refresh stops order
           r.compute
