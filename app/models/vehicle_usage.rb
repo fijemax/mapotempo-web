@@ -61,7 +61,7 @@ class VehicleUsage < ApplicationRecord
 
   scope :active, ->{ where(active: true) }
   scope :for_customer_id, ->(customer_id) { joins(:vehicle_usage_set).where(vehicle_usage_sets: { customer_id: customer_id }) }
-  scope :with_stores, (-> { includes(:store_start, :store_stop, :store_rest) })
+  scope :with_stores, -> { includes(:store_start, :store_stop, :store_rest) }
 
   amoeba do
     exclude_association :routes

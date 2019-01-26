@@ -19,7 +19,7 @@ class ApiWeb::V01::PlanningsController < ApiWeb::V01::ApiWebController
   skip_before_filter :verify_authenticity_token # because rails waits for a form token with POST
   load_and_authorize_resource
   before_action :manage_planning
-  around_action :includes_destinations, only: [:print]
+  around_action :includes_sub_models, only: [:print]
 
   swagger_controller :plannings, 'Plannings'
 
@@ -55,8 +55,14 @@ class ApiWeb::V01::PlanningsController < ApiWeb::V01::ApiWebController
     @callback_button = true
   end
 
-  def includes_destinations
-    Route.includes_destinations.scoping do
+  def includes_sub_models
+    if action_name.to_sym == :print
+      VehicleUsage.with_stores.scoping do
+        Route.includes_destinations.scoping do
+          yield
+        end
+      end
+    else
       yield
     end
   end

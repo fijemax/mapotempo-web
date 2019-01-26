@@ -411,17 +411,27 @@ class PlanningsController < ApplicationController
     @planning = current_user.customer.plannings.find(params[:id] || params[:planning_id])
   end
 
-  def includes_sub_models
+  def includes_destinations
     if @with_stops && (params[:route_id] || params[:route_ids] || [:automatic_insert, :optimize].include?(action_name.to_sym))
+      # Preload only stops from necessary routes
       Stop.includes_destinations.scoping do
         yield
       end
     elsif @with_stops && ([:show, :edit].exclude?(action_name.to_sym) || !request.format.html?)
+      # Preload all stops from all routes
       Route.includes_destinations.scoping do
         yield
       end
     else
       yield
+    end
+  end
+
+  def includes_sub_models
+    VehicleUsage.with_stores.scoping do
+      includes_destinations do
+        yield
+      end
     end
   end
 
