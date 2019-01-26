@@ -88,7 +88,7 @@ group :test do
   gem 'chromedriver-helper'
 end
 
-gem 'grape'
+gem 'grape', '< 1'
 gem 'grape-entity'
 gem 'grape-swagger'
 gem 'grape-swagger-entity'
