@@ -90,8 +90,8 @@ end
 
 gem 'grape', '< 1'
 gem 'grape-entity'
-gem 'grape-swagger'
-gem 'grape-swagger-entity'
+gem 'grape-swagger', '< 0.30'
+gem 'grape-swagger-entity', '< 0.3'
 gem 'rack-cors'
 gem 'swagger-docs'
 
