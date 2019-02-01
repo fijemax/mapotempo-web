@@ -2300,6 +2300,7 @@ var plannings_edit = function(params) {
         var serviceTitle = 'plannings.edit.dialog.' + service + '.title';
         var dialog = bootstrap_dialog({
           icon: 'fa-bars',
+          replaceOnlyModalIcon: true,
           title: I18n.t(serviceTitle),
           message: SMT['modals/default_with_spinner']({
             msg: I18n.t(serviceInProgress)
