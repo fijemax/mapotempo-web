@@ -56,6 +56,7 @@ class V01::TagsTest < ActiveSupport::TestCase
 
   test 'should create a tag without icon' do
     @tag.icon = '' # Use default icon instead
+    @tag.label = 'New label'
     post api(), @tag.attributes
     assert_equal 201, last_response.status
     response = JSON.parse(last_response.body)

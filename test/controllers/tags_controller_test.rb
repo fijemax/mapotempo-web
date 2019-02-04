@@ -33,7 +33,7 @@ class TagsControllerTest < ActionController::TestCase
 
   test 'should create tag' do
     assert_difference('Tag.count') do
-      post :create, tag: { label: @tag.label }
+      post :create, tag: { label: 'label' }
     end
 
     assert_redirected_to tags_path

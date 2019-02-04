@@ -627,6 +627,7 @@
         'tag':
           'icon_unknown': 'n''est pas une icône font-awesome autorisée'
           'icon_size_invalid': 'n''est pas une taille valide'
+          'uniqueness': 'Un libellé existe déjà avec ce nom'
         'optimization_time':
           'must_be_greater_than_minimal_time': 'doit être supérieur à la durée minimale'
         'router':
