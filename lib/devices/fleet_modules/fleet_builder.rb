@@ -19,8 +19,10 @@ module FleetBuilder
   def build_route_with_missions(route, customer)
     destinations = []
     departure = route.vehicle_usage.default_store_start
+    index_counter = -1
 
     destinations << {
+      index: index_counter += 1,
       mission_type: 'departure',
       external_ref: generate_store_id(departure, route, p_time(route, route.start), type: 'departure'),
       name: departure.name,
@@ -81,12 +83,14 @@ module FleetBuilder
           street: destination.street
         },
         time_windows: visit ? time_windows : nil,
-        quantities: destination.is_a?(StopVisit) && !customer.enable_orders ? VisitQuantities.normalize(destination.visit, route.vehicle_usage.try(&:vehicle)) : nil
+        quantities: destination.is_a?(StopVisit) && !customer.enable_orders ? VisitQuantities.normalize(destination.visit, route.vehicle_usage.try(&:vehicle)) : nil,
+        index: index_counter += 1,
       }.compact
     end
 
     arrival = route.vehicle_usage.default_store_stop
     destinations << {
+      index: index_counter += 1,
       mission_type: 'arrival',
       external_ref: generate_store_id(arrival, route, p_time(route, route.end), type: 'arrival'),
       name: arrival.name,
